@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'screens/conversation.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -15,6 +17,10 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       home: const MyHomePage(),
+      ////////////////////////////////////////////// USE THESE FOR NAVIGATING ///////////////////////////////////////////////////
+      routes: {
+        "/conversation": (context) => ConversationPage(),
+      },
     );
   }
 }
@@ -24,6 +30,13 @@ class MyHomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Text("XD");
+    return Scaffold(
+      body: Center(
+        child: ElevatedButton(
+          onPressed: () => Navigator.pushNamed(context, "/conversation"),
+          child: Text("Tap Me!"),
+        ),
+      ),
+    );
   }
 }
