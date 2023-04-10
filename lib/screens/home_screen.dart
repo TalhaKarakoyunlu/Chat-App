@@ -3,9 +3,17 @@ import 'package:chat_app/pages/contacts_page.dart';
 import 'package:chat_app/pages/messages_page.dart';
 import 'package:chat_app/pages/notifications_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
+
+import '../helpers.dart';
+import '../theme.dart';
+import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key);
+
+  final ValueNotifier<int> pageIndex = ValueNotifier(0);
+  final ValueNotifier<String> title = ValueNotifier("Messages");
 
   final pages = const [
     MessagesPage(),
@@ -14,17 +22,73 @@ class HomeScreen extends StatelessWidget {
     ContactsPage(),
   ];
 
+  final pageTitleList = const [
+    "Messages",
+    "Notifications",
+    "Calls",
+    "Contacts",
+  ];
+
+  void _onNavigationItemSelected(index) {
+    title.value = pageTitleList[index];
+    pageIndex.value = index;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: pages[0],
-      bottomNavigationBar: _BottomNavigationBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        title: ValueListenableBuilder(
+          valueListenable: title,
+          builder: (BuildContext context, String value, _) {
+            return Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 16,
+              ),
+            );
+          },
+        ),
+        actions: const [
+          Avatar.small(
+            url:
+                "https://talhakarakoyunlu.github.io/cv/images/talha%20profile%20picture.png",
+          ),
+        ],
+      ),
+      body: ValueListenableBuilder(
+        valueListenable: pageIndex,
+        builder: (BuildContext context, int value, _) {
+          return pages[value];
+        },
+      ),
+      bottomNavigationBar:
+          _BottomNavigationBar(onSelected: _onNavigationItemSelected),
     );
   }
 }
 
-class _BottomNavigationBar extends StatelessWidget {
-  const _BottomNavigationBar({Key? key}) : super(key: key);
+class _BottomNavigationBar extends StatefulWidget {
+  const _BottomNavigationBar({Key? key, required this.onSelected})
+      : super(key: key);
+
+  final ValueChanged<int> onSelected;
+
+  @override
+  State<_BottomNavigationBar> createState() => _BottomNavigationBarState();
+}
+
+class _BottomNavigationBarState extends State<_BottomNavigationBar> {
+  var selectedIndex = 0;
+  void handleItemSelected(int index) {
+    setState(() {
+      selectedIndex = index;
+    });
+    widget.onSelected(index);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,22 +97,34 @@ class _BottomNavigationBar extends StatelessWidget {
       bottom: true,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: const [
+        children: [
           _NavigationBarItem(
             label: "Message",
-            icon: Icons.message,
+            icon: CupertinoIcons.bubble_left_bubble_right_fill,
+            index: 0,
+            onTap: handleItemSelected,
+            isSelected: (selectedIndex == 0),
           ),
           _NavigationBarItem(
             label: "Notifications",
-            icon: Icons.notifications_none_outlined,
+            icon: CupertinoIcons.bell_fill,
+            index: 1,
+            onTap: handleItemSelected,
+            isSelected: (selectedIndex == 1),
           ),
           _NavigationBarItem(
             label: "Calls",
-            icon: Icons.phone_enabled_outlined,
+            icon: CupertinoIcons.phone_fill,
+            index: 2,
+            onTap: handleItemSelected,
+            isSelected: (selectedIndex == 2),
           ),
           _NavigationBarItem(
             label: "Contacts",
-            icon: Icons.book_outlined,
+            icon: CupertinoIcons.person_2_fill,
+            index: 3,
+            onTap: handleItemSelected,
+            isSelected: (selectedIndex == 3),
           ),
         ],
       ),
@@ -61,19 +137,49 @@ class _NavigationBarItem extends StatelessWidget {
     Key? key,
     required this.label,
     required this.icon,
+    required this.index,
+    required this.onTap,
+    this.isSelected = false,
   }) : super(key: key);
 
+  final int index;
   final String label;
   final IconData icon;
+  final ValueChanged<int> onTap;
+  final bool isSelected;
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon),
-        Text(label),
-      ],
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        onTap(index);
+      },
+      child: SizedBox(
+        height: 65,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: isSelected ? 24 : 20,
+              color: isSelected ? AppColors.secondary : null,
+            ),
+            const SizedBox(
+              height: 8,
+            ),
+            Text(
+              label,
+              style: isSelected
+                  ? const TextStyle(
+                      fontSize: 16,
+                      color: AppColors.secondary,
+                      fontWeight: FontWeight.bold)
+                  : const TextStyle(fontSize: 12),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
