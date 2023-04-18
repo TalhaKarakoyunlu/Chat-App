@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import 'screens/conversation.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  MyApp({super.key});
+  var theme = "light";
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +20,13 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
+      debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
       ////////////////////////////////////////////// USE THESE FOR NAVIGATING ///////////////////////////////////////////////////
       routes: {
-        "/conversation": (context) => ConversationPage(),
+        "/conversation": (context) => ConversationPage(
+              theme: "light",
+            ),
       },
     );
   }
