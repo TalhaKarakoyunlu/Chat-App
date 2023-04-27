@@ -16,4 +16,5 @@ class Themes {
   static const bubbleText = Color.fromRGBO(47, 54, 75, 0.8);
   static const bubbleTextTime = Color.fromRGBO(47, 54, 75, 0.5);
   static const inputBackground = Color.fromRGBO(209, 213, 252, 1.0);
+  static const buttonShadow = Color.fromRGBO(209, 213, 252, 0.7);
 }

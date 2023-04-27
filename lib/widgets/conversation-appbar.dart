@@ -21,12 +21,27 @@ class Bar extends StatelessWidget {
                 children: [
                   Padding(
                     padding: const EdgeInsets.fromLTRB(13, 0, 25, 0),
-                    child: Icon(
-                      Icons.arrow_back_rounded,
-                      color: theme == "light"
-                          ? Themes.buttonDark
-                          : Themes.buttonLight,
-                      size: 27,
+                    child: ElevatedButton(
+                      style: ButtonStyle(
+                        shape: MaterialStateProperty.all<CircleBorder>(
+                            CircleBorder()),
+                        backgroundColor:
+                            MaterialStateProperty.all(Colors.transparent),
+                        overlayColor:
+                            MaterialStateProperty.all(Themes.buttonShadow),
+                        shadowColor:
+                            MaterialStateProperty.all(Colors.transparent),
+                      ),
+                      child: Icon(
+                        Icons.arrow_back_rounded,
+                        color: theme == "light"
+                            ? Themes.buttonDark
+                            : Themes.buttonLight,
+                        size: 27,
+                      ),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
                   ),
                   Padding(
