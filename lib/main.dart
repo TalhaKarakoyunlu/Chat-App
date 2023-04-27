@@ -1,4 +1,5 @@
 import 'package:chat_app/screens/home_screen.dart';
+import 'package:chat_app/screens/signup_screen.dart';
 import 'package:chat_app/theme.dart';
 import 'package:flutter/material.dart';
 
@@ -17,7 +18,7 @@ class MyApp extends StatelessWidget {
       darkTheme: AppTheme().dark,
       themeMode: ThemeMode.dark,
       title: "Chat App",
-      home: HomeScreen(),
+      home: SignupScreen(),
     );
   }
 }
