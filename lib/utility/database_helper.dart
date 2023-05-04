@@ -1,45 +1,105 @@
-import 'package:sqflite/sqflite.dart';
-import 'package:path/path.dart' show join;
-import 'package:chat_app/models/users_model.dart';
+import 'package:mysql1/mysql1.dart';
 
 class DatabaseHelper {
 
-  static const int _version = 1;
-  static const String _db_name = 'chats.db';
+    // Open a connection
+   Future<MySqlConnection?> createConnection() async {
 
-  static Future<Database> _openDB() async {
-    return openDatabase(
-      join(await getDatabasesPath(), _db_name),
-      onCreate: (db, version) async => await db.execute("CREATE TABLE users (id INTEGER PRIMARY KEY AUTOINCREMENT, username TEXT UNIQUE NOT NULL, email TEXT NOT NULL, password TEXT NOT NULL);"),
-      version: _version
-    );
-  }
-
-  static Future<int> insertUser(Users user) async {
-    final db = await _openDB();
-    return await db.insert("Users", user.toJson(), conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  static Future<int> updateUser(Users user) async {
-    final db = await _openDB();
-    return await db.update("Users", user.toJson(), where: 'id=?', whereArgs: [user.id], conflictAlgorithm: ConflictAlgorithm.replace);
-  }
-
-  static Future<int> deleteUser(Users user) async {
-    final db = await _openDB();
-    return await db.delete("Users", where: 'id=?', whereArgs: [user.id]);
-  }
-
-  static Future<List<Users>?> showUsers() async {
-    final db = await _openDB();
-
-    final List<Map<String, dynamic>> maps = await db.query("Users");
-
-    if (maps.isEmpty) {
-      return null;
+     MySqlConnection? conn;
+     try {
+      conn = await MySqlConnection.connect(ConnectionSettings(
+              host: '192.168.1.220',
+              port: 3306,
+              user: 'root',
+              db: 'chat',
+              password: '4?zDVqy#8b'),
+      );
+    } catch (e) {
+       print('Connection failed');
+      print(e);
     }
 
-    return List.generate(maps.length, (index) => Users.fromJson(maps[index]));
+     print('Connection successful');
+
+     return conn;
+
   }
+
+  Future insertUser(String name, String username, String phoneNumber, String email, String password) async {
+
+     MySqlConnection? conn = await createConnection();
+     var result;
+
+     if (conn != null) {
+       // Create a table
+       result = await conn.query(
+           'insert into users (name, username, phoneNumber, email, password) values (?, ?, ?, ?, ?)',
+           [name, username, phoneNumber, email, password]);
+       print('Inserted row id=${result.insertId}');
+     }
+
+     await removeConnection(conn);
+
+
+    return result;
+  }
+
+  Future<dynamic> showUsers(result) async {
+
+    MySqlConnection? conn = await createConnection();
+
+    if (conn != null) {
+      // Query the database using a parameterized query
+      var results = await conn.query(
+          'select email from users where id = ?', [result.insertId]);
+      for (var row in results) {
+        // print('Name: ${row[0]}, email: ${row[1]}');
+        return row[0];
+      }
+    }
+
+    await removeConnection(conn);
+  }
+
+  Future<void> updateUserEmail(String newEmail, oldEmail) async {
+    MySqlConnection? conn = await createConnection();
+
+    if (conn != null) {
+      await conn.query('update users set email=? where email=?', [newEmail, oldEmail]);
+    }
+
+    await removeConnection(conn);
+   }
+
+  Future<void> updateUserPassword(String newPassword, oldPassword) async {
+
+    MySqlConnection? conn = await createConnection();
+
+    if (conn != null) {
+      await conn.query('update users set password=? where password=?', [newPassword, oldPassword]);
+    }
+
+    await removeConnection(conn);   }
+
+   Future<void> deleteUser(String password) async {
+
+     MySqlConnection? conn = await createConnection();
+
+     if (conn != null) {
+       await conn.query('delete from users where password=?', [password]);
+     }
+
+     await removeConnection(conn);
+
+   }
+
+   Future<void> removeConnection(MySqlConnection? conn) async {
+     // Close the connection
+
+     if (conn != null) {
+       await conn.close();
+     }
+
+   }
 
 }
