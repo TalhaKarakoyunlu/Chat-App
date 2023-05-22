@@ -1,4 +1,5 @@
 import 'package:mysql1/mysql1.dart';
+import 'secrets.dart';
 
 class DatabaseHelper {
 
@@ -8,11 +9,11 @@ class DatabaseHelper {
      MySqlConnection? conn;
      try {
       conn = await MySqlConnection.connect(ConnectionSettings(
-              host: '192.168.1.220',
+              host: host,
               port: 3306,
               user: 'root',
               db: 'chat',
-              password: '4?zDVqy#8b'),
+              password: password),
       );
     } catch (e) {
        print('Connection failed');
