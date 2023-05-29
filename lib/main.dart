@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
+import 'utility/database_helper.dart';
 import 'screens/conversation.dart';
 
 void main() {
@@ -12,9 +12,21 @@ void main() {
 class MyApp extends StatelessWidget {
   MyApp({super.key});
   var theme = "light";
+  var db = DatabaseHelper();
 
   @override
   Widget build(BuildContext context) {
+
+    db.printVersion();
+
+    db.addUsersTable();
+
+    db.insertUser(0, 'Recep', 'TheBestAnswerer', '01234567891', 'testing@gmail.com', 'password');
+
+    db.selectUsersByUsername('TheBestAnswerer');
+
+    db.disposeTheDB();
+
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -23,6 +35,8 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const MyHomePage(),
       ////////////////////////////////////////////// USE THESE FOR NAVIGATING ///////////////////////////////////////////////////
+
+
       routes: {
         "/conversation": (context) => ConversationPage(
               theme: "light",
