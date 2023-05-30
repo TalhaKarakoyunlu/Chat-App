@@ -16,15 +16,24 @@ class _TestScreenState extends State<TestScreen> {
 
   @override
   void initState() {
-
-    createDBWithData();
-
     super.initState();
+    createDBWithData();
   }
 
-  void createDBWithData() async {
+  // Creates connection. And shows the users with the username 'PhoneEater'.
+  void createDBWithData() {
     DatabaseHelper db = DatabaseHelper();
-    db.insertUser('Recep', 'PhoneEater', '05551114422', 'recep@gmail.com', 'HeyDon\'tTellAnyone');
+
+    db.createConnection().then((conn) {
+      db.findUsersByUsername(conn!, 'PhoneEater');
+
+      // Codes for inserting a user, then showing it with showUsers() method.
+      // db.insertUser(conn!, 'Recep', 'PhoneEater', '05551114422', 'recep@gmail.com', 'HeyDon\'tTellAnyone').then((result) {
+      //   db.showUsers(conn, result);
+      // });
+    });
+
+
   }
 
   @override
