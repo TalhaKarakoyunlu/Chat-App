@@ -17,16 +17,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    db.printVersion();
-
-    db.addUsersTable();
-
-    db.insertUser(0, 'Recep', 'TheBestAnswerer', '01234567891', 'testing@gmail.com', 'password');
-
-    db.selectUsersByUsername('TheBestAnswerer');
-
-    db.disposeTheDB();
-
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
