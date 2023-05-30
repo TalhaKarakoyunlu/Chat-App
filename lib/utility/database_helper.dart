@@ -1,70 +1,106 @@
-import 'package:sqlite3/sqlite3.dart';
+import 'package:mysql1/mysql1.dart';
+import 'secrets.dart';
 
 class DatabaseHelper {
 
-  final db = sqlite3.openInMemory();
+    // Open a connection
+   Future<MySqlConnection?> createConnection() async {
 
-  void printVersion() {
-    print('Using sqlite3 ${sqlite3.version}');
-  }
-
-  void addUsersTable() {
-    db.execute('''
-        CREATE TABLE users (
-          id INT PRIMARY KEY,
-          name VARCHAR(50) NOT NULL,
-          username VARCHAR(50) UNIQUE NOT NULL,
-          phoneNumber VARCHAR(50) UNIQUE NOT NULL,
-          email VARCHAR(50) NOT NULL,
-          password VARCHAR(100) NOT NULL
-        );
-    ''');
-  }
-
-  void dropUsersTable() {
-    db.execute('DROP TABLE users;');
-  }
-
-  void addMessagesTable() {
-    db.execute('''
-        CREATE TABLE messages (
-          id INT PRIMARY KEY,
-          message VARCHAR(1500) NOT NULL,
-          sender_id INT,
-          receiver_id INT,
-          created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP NOT NULL,
-          FOREIGN KEY (sender_id) REFERENCES USERS(id),
-          FOREIGN KEY (receiver_id) REFERENCES USERS(id)
-        );
-    ''');
-  }
-
-  void dropMessagesTable() {
-    db.execute('DROP TABLE messages;');
-  }
-
-  void insertUser(int id, String name, String username, String phoneNumber, String email, String password) {
-    final stmt = db.prepare('INSERT INTO users (id, name, username, phoneNumber, email, password) VALUES (?, ?, ?, ?, ?, ?)');
-    stmt.execute([id, name, username, phoneNumber, email, password]);
-    stmt.dispose();
-  }
-
-  void selectUsersByUsername(String username) {
-    // You can run select statements with PreparedStatement.select, or directly
-    // on the database:
-    final ResultSet resultSet =
-    db.select('SELECT * FROM users WHERE username = ?', [username]);
-
-    // You can iterate on the result set in multiple ways to retrieve Row objects
-    // one by one.
-    for (final Row row in resultSet) {
-      print('User[name: ${row['name']}, username: ${row['username']}, phoneNumber: ${row['phoneNumber']}, email: ${row['email']}, password: ${row['password']}]');
+     MySqlConnection? conn;
+     try {
+      conn = await MySqlConnection.connect(ConnectionSettings(
+              host: host,
+              port: 3306,
+              user: user,
+              db: db,
+              password: password),
+      );
+    } catch (e) {
+       print('Connection failed');
+      print(e);
     }
+
+     print('Connection successful');
+
+     return conn;
+
   }
 
-  void disposeTheDB() {
-    db.dispose();
+  Future insertUser(String name, String username, String phoneNumber, String email, String password) async {
+
+     MySqlConnection? conn = await createConnection();
+     var result;
+
+     if (conn != null) {
+       // Create a table
+       result = await conn.query(
+           'insert into users (name, username, phoneNumber, email, password) values (?, ?, ?, ?, ?)',
+           [name, username, phoneNumber, email, password]);
+       print('Inserted row id=${result.insertId}');
+     }
+
+     await removeConnection(conn);
+
+
+    return result;
   }
+
+  Future<dynamic> showUsers(result) async {
+
+    MySqlConnection? conn = await createConnection();
+
+    if (conn != null) {
+      // Query the database using a parameterized query
+      var results = await conn.query(
+          'select email from users where id = ?', [result.insertId]);
+      for (var row in results) {
+        // print('Name: ${row[0]}, email: ${row[1]}');
+        return row[0];
+      }
+    }
+
+    await removeConnection(conn);
+  }
+
+  Future<void> updateUserEmail(String newEmail, oldEmail) async {
+    MySqlConnection? conn = await createConnection();
+
+    if (conn != null) {
+      await conn.query('update users set email=? where email=?', [newEmail, oldEmail]);
+    }
+
+    await removeConnection(conn);
+   }
+
+  Future<void> updateUserPassword(String newPassword, oldPassword) async {
+
+    MySqlConnection? conn = await createConnection();
+
+    if (conn != null) {
+      await conn.query('update users set password=? where password=?', [newPassword, oldPassword]);
+    }
+
+    await removeConnection(conn);   }
+
+   Future<void> deleteUser(String password) async {
+
+     MySqlConnection? conn = await createConnection();
+
+     if (conn != null) {
+       await conn.query('delete from users where password=?', [password]);
+     }
+
+     await removeConnection(conn);
+
+   }
+
+   Future<void> removeConnection(MySqlConnection? conn) async {
+     // Close the connection
+
+     if (conn != null) {
+       await conn.close();
+     }
+
+   }
 
 }
-
