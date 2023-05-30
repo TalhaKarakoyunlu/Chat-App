@@ -11,8 +11,8 @@ class DatabaseHelper {
       conn = await MySqlConnection.connect(ConnectionSettings(
               host: host,
               port: 3306,
-              user: 'root',
-              db: 'chat',
+              user: user,
+              db: db,
               password: password),
       );
     } catch (e) {

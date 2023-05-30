@@ -25,8 +25,6 @@ class _TestScreenState extends State<TestScreen> {
   void createDBWithData() async {
     DatabaseHelper db = DatabaseHelper();
     db.insertUser('Recep', 'PhoneEater', '05551114422', 'recep@gmail.com', 'HeyDon\'tTellAnyone');
-
-
   }
 
   @override
