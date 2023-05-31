@@ -1,4 +1,6 @@
 import 'package:chat_app/screens/home_screen.dart';
+import 'package:chat_app/screens/signin_screen.dart';
+import 'package:chat_app/utility/database_helper.dart';
 import 'package:flutter/material.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -10,31 +12,41 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
 
-  TextEditingController emailController = TextEditingController();
+  // Initialize all necessary variables.
+  DatabaseHelper db = DatabaseHelper();
+
+  TextEditingController nameController = TextEditingController();
   TextEditingController usernameController = TextEditingController();
+  TextEditingController phoneNumberController = TextEditingController();
+  TextEditingController emailController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
   TextEditingController retypePasswordController = TextEditingController();
 
-  String email = '';
+  String name = 'No-name';
   String username = '';
+  String phoneNumber = '';
+  String email = '';
   String password = '';
   String retypePassword = '';
 
   @override
   Widget build(BuildContext context) {
+    // TODO: Improve the UI design.
+
     return Scaffold(
       body: Center(
-        child: Container(
+        child: SizedBox(
           width: 250,
+          // Column of TextField and Buttons.
           child: Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               TextField(
-                controller: emailController,
-                keyboardType: TextInputType.emailAddress,
-                autocorrect: false,
+                controller: nameController,
+                keyboardType: TextInputType.text,
+                autocorrect: true,
                 decoration: InputDecoration(
-                    label: Text('Email')
+                    label: Text('Name')
                 ),
               ),
               TextField(
@@ -46,8 +58,24 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               TextField(
+                controller: phoneNumberController,
+                keyboardType: TextInputType.number,
+                autocorrect: true,
+                decoration: InputDecoration(
+                    label: Text('Phone number')
+                ),
+              ),
+              TextField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                autocorrect: false,
+                decoration: InputDecoration(
+                    label: Text('Email')
+                ),
+              ),
+              TextField(
                 controller: passwordController,
-                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
                 autocorrect: false,
                 decoration: InputDecoration(
                     label: Text('Password')
@@ -55,7 +83,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               TextField(
                 controller: retypePasswordController,
-                keyboardType: TextInputType.visiblePassword,
+                obscureText: true,
                 autocorrect: false,
                 decoration: InputDecoration(
                     label: Text('Retype Password')
@@ -63,17 +91,42 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               TextButton(
                 onPressed: () {
-                  if(email.isNotEmpty && username.isNotEmpty && password.isNotEmpty && retypePassword.isNotEmpty) {
-                    email = emailController.text;
-                    username = usernameController.text;
-                    password = passwordController.text;
-                    retypePassword = retypePasswordController.text;
+                  // Nested if loops check that required boxes are filled before authentication.
+                  if (usernameController.text.isNotEmpty) {
+                    if (phoneNumberController.text.isNotEmpty && emailController.text.isNotEmpty) {
+                      if (passwordController.text.isNotEmpty && retypePasswordController.text.isNotEmpty && passwordController.text.length > 5) {
+                        name = nameController.text;
+                        username = usernameController.text;
+                        phoneNumber = phoneNumberController.text.trim();
+                        email = emailController.text;
+                        password = passwordController.text;
+                        retypePassword = retypePasswordController.text;
 
-                    if (password == retypePassword) {
-                      // TODO Add authentication here
+                        // Prints username to check if that works.
+                        print(username);
+
+                        // If all conditions met, add the user to the database and go the main screen.
+                        if (password == retypePassword) {
+                          db.createConnection().then((conn) {
+                            db.insertUser(conn!, name, username, phoneNumber, email, password).then((result) {
+                              db.showUsers(conn, result);
+                            });
+                          });
+
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+                        } else {
+                          print('Passwords do not match');
+                        }
+                      } else {
+                        print('Password must be at least 6 characters long');
+                      }
+                    } else {
+                      print('Phone number and email are required');
                     }
-
+                  } else {
+                    print('Username is required');
                   }
+
               },
                 child: Text('SIGN UP'),
               ),
@@ -83,19 +136,11 @@ class _SignupScreenState extends State<SignupScreen> {
                   TextButton(
                       onPressed: () {
                     Navigator.push(context, MaterialPageRoute(builder: (context) {
-                      return HomeScreen();
+                      return SigninScreen();
                     }));
                   },
                       child: Text('Log in'))
                 ],
-              ),
-              TextButton(
-                onPressed: () {
-                Navigator.push(context, MaterialPageRoute(builder: (context) {
-                  return HomeScreen();
-                }));
-              },
-                  child: Text('Go to Main Screen'),
               ),
             ],
           ),

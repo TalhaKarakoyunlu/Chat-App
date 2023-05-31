@@ -1,3 +1,4 @@
+import 'package:chat_app/screens/signup_screen.dart';
 import 'package:chat_app/screens/test_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -24,10 +25,8 @@ class MyApp extends StatelessWidget {
         primarySwatch: Colors.blue,
       ),
       debugShowCheckedModeBanner: false,
-      home: const TestScreen(),
+      home: const SignupScreen(),
       ////////////////////////////////////////////// USE THESE FOR NAVIGATING ///////////////////////////////////////////////////
-
-
       routes: {
         "/conversation": (context) => ConversationPage(
               theme: "light",

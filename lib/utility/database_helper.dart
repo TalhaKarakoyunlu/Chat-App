@@ -1,6 +1,7 @@
 import 'package:mysql1/mysql1.dart';
 import 'secrets.dart';
 
+// TODO: Add CRUD methods for messages table and the future tables.
 class DatabaseHelper {
 
     // Open a connection
@@ -19,7 +20,6 @@ class DatabaseHelper {
        print('Connection failed');
       print(e);
     }
-
      return conn;
 
   }
@@ -39,7 +39,6 @@ class DatabaseHelper {
 
   // Shows all users after inserting new data.
   Future<dynamic> showUsers(MySqlConnection conn, Results result) async {
-
     var results = await conn.query(
         'select name, email from users where id = ?', [result.insertId]);
     for (var row in results) {
@@ -50,17 +49,34 @@ class DatabaseHelper {
     await removeConnection(conn);
   }
 
+  // TODO: Add findByPhoneNumber() method.
+
   // Shows all columns of data for the user with the given username
    Future<dynamic> findUsersByUsername(MySqlConnection conn, String username) async {
      var results = await conn.query(
          'select * from users where username = ?', [username]);
      for (var row in results) {
        print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
-       return row[0];
      }
 
      await removeConnection(conn);
+
+     return results;
    }
+
+   Future<dynamic> findUsersByEmail(MySqlConnection conn, String email) async {
+     var results = await conn.query(
+         'select * from users where email = ?', [email]);
+     for (var row in results) {
+       print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+     }
+
+     await removeConnection(conn);
+
+     return results;
+   }
+
+   // TODO: Add update methods.
 
    // Updates user email
   Future<void> updateUserEmail(String newEmail, oldEmail) async {
