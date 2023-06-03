@@ -2,6 +2,7 @@ import 'package:chat_app/pages/calls_page.dart';
 import 'package:chat_app/pages/contacts_page.dart';
 import 'package:chat_app/pages/messages_page.dart';
 import 'package:chat_app/pages/notifications_page.dart';
+import 'package:chat_app/utility/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
@@ -10,10 +11,13 @@ import '../theme.dart';
 import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key}) : super(key: key);
+  HomeScreen({Key? key, required this.email, required this.username, required this.name}) : super(key: key);
 
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ValueNotifier<String> title = ValueNotifier("Messages");
+  final String email;
+  final String username;
+  final String name;
 
   final pages = const [
     MessagesPage(),
@@ -37,6 +41,8 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
+    print(username);
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -44,16 +50,26 @@ class HomeScreen extends StatelessWidget {
         title: ValueListenableBuilder(
           valueListenable: title,
           builder: (BuildContext context, String value, _) {
-            return Text(
-              value,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
-              ),
+            return Row(
+              children: [
+                Column(
+                  children: [
+                    Text(username, style: TextStyle(color: Colors.black),),
+                    Text(name, style: TextStyle(color: Colors.black),)
+                  ],
+                ),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+              ],
             );
           },
         ),
-        actions: const [
+        actions: [
           Avatar.small(
             url:
                 "https://talhakarakoyunlu.github.io/cv/images/talha%20profile%20picture.png",

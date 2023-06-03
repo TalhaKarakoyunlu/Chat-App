@@ -86,7 +86,10 @@ class _SigninScreenState extends State<SigninScreen> {
                             users = await db.findUsersByEmail(conn!, emailOrUsername);
 
                             for (var row in users) {
+                              var name = row[1];
+                              var username = row[2];
                               var email = row[4];
+
                               var DBpassword = row[5];
 
                               print(emailOrUsername);
@@ -97,7 +100,8 @@ class _SigninScreenState extends State<SigninScreen> {
 
                               if (emailOrUsername == email && password == DBpassword) {
                                 print('Email is correct. Signing in...' + row[2]);
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+                                // TODO: Remove parameters and use ValueListenables instead.
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(name: name, username: username, email: email,)));
                               } else {
                                 print('Wrong email. Try again');
                               }
@@ -109,12 +113,16 @@ class _SigninScreenState extends State<SigninScreen> {
                             users = await db.findUsersByUsername(conn!, emailOrUsername);
 
                             for (var row in users) {
+
+                              var name = row[1];
                               var username = row[2];
+                              var email = row[4];
                               var DBpassword = row[5];
 
                               if (username == emailOrUsername  && DBpassword == password) {
                                 print('Username is correct. Signing in...' + username);
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+                                // TODO: Remove parameters and use ValueListenables instead.
+                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(name: name, username: username, email: email,)));
                               } else {
                                 print('Wrong username. Try again');
                               }
@@ -141,7 +149,7 @@ class _SigninScreenState extends State<SigninScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return HomeScreen();
+                    return HomeScreen(email: '', username: '', name: '',);
                   }));
                 },
                 child: Text('Go to Main Screen'),

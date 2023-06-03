@@ -113,7 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             });
                           });
 
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(email: '', username: '', name: '',)));
                         } else {
                           print('Passwords do not match');
                         }
