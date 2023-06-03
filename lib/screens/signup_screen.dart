@@ -108,12 +108,12 @@ class _SignupScreenState extends State<SignupScreen> {
                         // If all conditions met, add the user to the database and go the main screen.
                         if (password == retypePassword) {
                           db.createConnection().then((conn) {
-                            db.insertUser(conn!, name, username, phoneNumber, email, password).then((result) {
+                            db.insertUser(conn!, name, username, phoneNumber, email, password, null).then((result) {
                               db.showUsers(conn, result);
                             });
                           });
 
-                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(email: '', username: '', name: '',)));
+                          Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
                         } else {
                           print('Passwords do not match');
                         }

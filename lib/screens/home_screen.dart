@@ -3,21 +3,22 @@ import 'package:chat_app/pages/contacts_page.dart';
 import 'package:chat_app/pages/messages_page.dart';
 import 'package:chat_app/pages/notifications_page.dart';
 import 'package:chat_app/utility/database_helper.dart';
+import 'package:chat_app/utility/user_data_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../helpers.dart';
+import '../models/user_data.dart';
 import '../theme.dart';
 import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key, required this.email, required this.username, required this.name}) : super(key: key);
+  HomeScreen({Key? key, UserDataNotifier? this.userDataNotifier}) : super(key: key);
 
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ValueNotifier<String> title = ValueNotifier("Messages");
-  final String email;
-  final String username;
-  final String name;
+  UserDataNotifier? userDataNotifier;
 
   final pages = const [
     MessagesPage(),
@@ -40,9 +41,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
-    print(username);
-
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -52,11 +50,27 @@ class HomeScreen extends StatelessWidget {
           builder: (BuildContext context, String value, _) {
             return Row(
               children: [
-                Column(
-                  children: [
-                    Text(username, style: TextStyle(color: Colors.black),),
-                    Text(name, style: TextStyle(color: Colors.black),)
-                  ],
+                Consumer<UserDataNotifier>(
+                  builder: (context, userDataNotifier, _) {
+                    List<UserData> userDataList = userDataNotifier.value;
+
+                    if (userDataList == null || userDataList.isEmpty) {
+                      return Text(
+                        'No user data available',
+                        style: TextStyle(color: Colors.black),
+                      );
+                    }
+
+                    final userData = userDataList[0];
+
+                    return Row(
+                      children: [
+                        Text('Name: ${userData.name}', style: TextStyle(color: Colors.black)),
+                        Text('Username: ${userData.username}', style: TextStyle(color: Colors.black)),
+                        Text('Email: ${userData.email}', style: TextStyle(color: Colors.black)),
+                      ],
+                    );
+                  },
                 ),
                 Text(
                   value,

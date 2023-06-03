@@ -3,22 +3,22 @@ import 'package:chat_app/screens/signup_screen.dart';
 import 'package:chat_app/utility/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
+import '../models/user_data.dart';
+import '../utility/user_data_notifier.dart';
+import 'package:provider/provider.dart';
 
-class SigninScreen extends StatefulWidget {
-  const SigninScreen({Key? key}) : super(key: key);
+class SigninScreen extends StatelessWidget {
+  SigninScreen({Key? key}) : super(key: key);
 
-  @override
-  State<SigninScreen> createState() => _SigninScreenState();
-}
+  UserDataNotifier userDataNotifier = UserDataNotifier();
 
-class _SigninScreenState extends State<SigninScreen> {
-
-  DatabaseHelper db = DatabaseHelper();
+  DatabaseHelper databaseHelper = DatabaseHelper();
 
   TextEditingController emailOrUsernameController = TextEditingController();
   TextEditingController passwordController = TextEditingController();
 
   String emailOrUsername = '';
+
   String password = '';
 
   // Checks if the given String is an email or a username.
@@ -37,6 +37,53 @@ class _SigninScreenState extends State<SigninScreen> {
       return false;
     }
   }
+
+  String getEmailOrUsername(BuildContext context) {
+    return emailOrUsernameController.text;
+  }
+
+  String getPassword(BuildContext context) {
+    return passwordController.text;
+  }
+
+  void signIn(BuildContext context) async {
+    final userDataNotifier = Provider.of<UserDataNotifier>(context, listen: false);
+    final emailOrUsername = getEmailOrUsername(context);
+    final password = getPassword(context);
+
+    // Assuming you have a method to check the sign-in credentials and retrieve user data
+    bool isSignInSuccessful = await databaseHelper.checkSignInCredentials(emailOrUsername, password);
+
+    if (isSignInSuccessful) {
+      // Example of updating user data in UserDataNotifier
+      userDataNotifier.updateUserData(emailOrUsername);
+
+      // Example of navigating to the home screen with the updated user data
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (context) => HomeScreen()),
+      );
+    } else {
+      // Handle sign-in failure
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: Text('Sign-in Failed'),
+            content: Text('Incorrect email/username or password.'),
+            actions: [
+              TextButton(
+                child: Text('OK'),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,57 +125,85 @@ class _SigninScreenState extends State<SigninScreen> {
                   if (emailOrUsernameController.text.isNotEmpty) {
                     if (passwordController.text.isNotEmpty) {
                       if (passwordController.text.length > 5) {
-                        dynamic users;
 
-                        if (isEmail(emailOrUsername)) {
-                          db.createConnection().then((conn) async {
-                            // value is an email.
-                            users = await db.findUsersByEmail(conn!, emailOrUsername);
+                          userDataNotifier.updateUserData(emailOrUsername);
 
-                            for (var row in users) {
-                              var name = row[1];
-                              var username = row[2];
-                              var email = row[4];
+                          userDataNotifier.addListener(() {
+                            List<UserData> updatedUserData = userDataNotifier.value;
 
-                              var DBpassword = row[5];
+                            bool isEmailInput = isEmail(emailOrUsername);
 
-                              print(emailOrUsername);
-                              print(email);
-                              print(DBpassword);
-                              print(password);
+                            for (var userData in updatedUserData) {
+                              var username = userData.username;
+                              var email = userData.email;
+                              var DBpassword = userData.password;
 
-
-                              if (emailOrUsername == email && password == DBpassword) {
-                                print('Email is correct. Signing in...' + row[2]);
-                                // TODO: Remove parameters and use ValueListenables instead.
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(name: name, username: username, email: email,)));
-                              } else {
-                                print('Wrong email. Try again');
+                              if ((isEmailInput && emailOrUsername == email) || (!isEmailInput && emailOrUsername == username)) {
+                                if (password == DBpassword) {
+                                  print('Sign in successful. Username: $username');
+                                  // TODO: Remove parameters and use ValueListenables instead. CHECKED ✅
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(userDataNotifier: userDataNotifier)));
+                                } else {
+                                  print('Incorrect password. Try again.');
+                                }
+                                return; // Exit the loop since a match is found
                               }
                             }
+
+                            // If the loop completes without finding a match, it means the email/username is incorrect
+                            print('Incorrect email/username. Try again.');
                           });
-                        } else {
-                          db.createConnection().then((conn) async {
-                            // value is a username.
-                            users = await db.findUsersByUsername(conn!, emailOrUsername);
 
-                            for (var row in users) {
 
-                              var name = row[1];
-                              var username = row[2];
-                              var email = row[4];
-                              var DBpassword = row[5];
 
-                              if (username == emailOrUsername  && DBpassword == password) {
-                                print('Username is correct. Signing in...' + username);
-                                // TODO: Remove parameters and use ValueListenables instead.
-                                Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(name: name, username: username, email: email,)));
-                              } else {
-                                print('Wrong username. Try again');
-                              }
-                            }
-                          });
-                        }
+                          // dynamic users;
+                          // db.createConnection().then((conn) async {
+                          //   // value is an email.
+                          //   users = await db.findUsersByEmail(conn!, emailOrUsername);
+                          //
+                          //   for (var row in users) {
+                          //     var name = row[1];
+                          //     var username = row[2];
+                          //     var email = row[4];
+                          //
+                          //     var DBpassword = row[5];
+                          //
+                          //     print(emailOrUsername);
+                          //     print(email);
+                          //     print(DBpassword);
+                          //     print(password);
+                          //
+                          //
+                          //     if (emailOrUsername == email && password == DBpassword) {
+                          //       print('Email is correct. Signing in...' + row[2]);
+                          //       // TODO: Remove parameters and use ValueListenables instead.
+                          //       Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+                          //     } else {
+                          //       print('Wrong email. Try again');
+                          //     }
+                          //   }
+                          // });
+
+                          // db.createConnection().then((conn) async {
+                          //   // value is a username.
+                          //   users = await db.findUsersByUsername(conn!, emailOrUsername);
+                          //
+                          //   for (var row in users) {
+                          //
+                          //     var name = row[1];
+                          //     var username = row[2];
+                          //     var email = row[4];
+                          //     var DBpassword = row[5];
+                          //
+                          //     if (username == emailOrUsername  && DBpassword == password) {
+                          //       print('Username is correct. Signing in...' + username);
+                          //       // TODO: Remove parameters and use ValueListenables instead.
+                          //       Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
+                          //     } else {
+                          //       print('Wrong username. Try again');
+                          //     }
+                          //   }
+                          // });
                       }
                     }
                   }
@@ -149,7 +224,7 @@ class _SigninScreenState extends State<SigninScreen> {
               TextButton(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {
-                    return HomeScreen(email: '', username: '', name: '',);
+                    return HomeScreen();
                   }));
                 },
                 child: Text('Go to Main Screen'),

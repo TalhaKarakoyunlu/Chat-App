@@ -1,14 +1,19 @@
 import 'package:chat_app/screens/signup_screen.dart';
 import 'package:chat_app/screens/test_screen.dart';
+import 'package:chat_app/utility/user_data_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'utility/database_helper.dart';
 import 'screens/conversation.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(MyApp());
+  runApp(ChangeNotifierProvider(
+    create: (context) => UserDataNotifier(),
+    child: MyApp(),
+  ),);
 }
 
 class MyApp extends StatelessWidget {
