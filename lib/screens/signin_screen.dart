@@ -121,19 +121,18 @@ class SigninScreen extends StatelessWidget {
               ),
               TextButton(
                 child: Text('SIGN IN'),
-                onPressed: () {
+                onPressed: () async {
                   if (emailOrUsernameController.text.isNotEmpty) {
                     if (passwordController.text.isNotEmpty) {
                       if (passwordController.text.length > 5) {
 
-                          userDataNotifier.updateUserData(emailOrUsername);
-
-                          userDataNotifier.addListener(() {
-                            List<UserData> updatedUserData = userDataNotifier.value;
+                        var userDataNotifier = Provider.of<UserDataNotifier>(context, listen: false);
+                        await userDataNotifier.updateUserData(emailOrUsername);
+                        List<UserData> allUserDatas = userDataNotifier.allUserDatas;
 
                             bool isEmailInput = isEmail(emailOrUsername);
 
-                            for (var userData in updatedUserData) {
+                            for (var userData in allUserDatas) {
                               var username = userData.username;
                               var email = userData.email;
                               var DBpassword = userData.password;
@@ -142,7 +141,7 @@ class SigninScreen extends StatelessWidget {
                                 if (password == DBpassword) {
                                   print('Sign in successful. Username: $username');
                                   // TODO: Remove parameters and use ValueListenables instead. CHECKED ✅
-                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen(userDataNotifier: userDataNotifier)));
+                                  Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
                                 } else {
                                   print('Incorrect password. Try again.');
                                 }
@@ -152,8 +151,6 @@ class SigninScreen extends StatelessWidget {
 
                             // If the loop completes without finding a match, it means the email/username is incorrect
                             print('Incorrect email/username. Try again.');
-                          });
-
 
 
                           // dynamic users;

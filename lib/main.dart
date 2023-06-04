@@ -10,8 +10,13 @@ import 'screens/conversation.dart';
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-  runApp(ChangeNotifierProvider(
-    create: (context) => UserDataNotifier(),
+  runApp(
+    MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+      create: (context) => UserDataNotifier(),
+    ),
+    ],
     child: MyApp(),
   ),);
 }

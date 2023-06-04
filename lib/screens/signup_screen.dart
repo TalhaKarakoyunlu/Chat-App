@@ -2,6 +2,10 @@ import 'package:chat_app/screens/home_screen.dart';
 import 'package:chat_app/screens/signin_screen.dart';
 import 'package:chat_app/utility/database_helper.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../models/user_data.dart';
+import '../utility/user_data_notifier.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({Key? key}) : super(key: key);
@@ -90,7 +94,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 ),
               ),
               TextButton(
-                onPressed: () {
+                onPressed: () async {
                   // Nested if loops check that required boxes are filled before authentication.
                   if (usernameController.text.isNotEmpty) {
                     if (phoneNumberController.text.isNotEmpty && emailController.text.isNotEmpty) {
@@ -107,12 +111,12 @@ class _SignupScreenState extends State<SignupScreen> {
 
                         // If all conditions met, add the user to the database and go the main screen.
                         if (password == retypePassword) {
-                          db.createConnection().then((conn) {
-                            db.insertUser(conn!, name, username, phoneNumber, email, password, null).then((result) {
-                              db.showUsers(conn, result);
-                            });
-                          });
+                          var userDataNotifier = Provider.of<UserDataNotifier>(context, listen: false);
+                          await userDataNotifier.createUserData(name, username, phoneNumber, email, password, null);
 
+                          print('Sign up successful. Username: $username');
+
+                          // TODO: Remove parameters and use ValueListenables instead. CHECKED ✅
                           Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
                         } else {
                           print('Passwords do not match');

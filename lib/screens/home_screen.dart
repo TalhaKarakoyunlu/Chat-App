@@ -14,11 +14,10 @@ import '../theme.dart';
 import '../widgets/widgets.dart';
 
 class HomeScreen extends StatelessWidget {
-  HomeScreen({Key? key, UserDataNotifier? this.userDataNotifier}) : super(key: key);
+  HomeScreen({Key? key}) : super(key: key);
 
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ValueNotifier<String> title = ValueNotifier("Messages");
-  UserDataNotifier? userDataNotifier;
 
   final pages = const [
     MessagesPage(),
@@ -52,8 +51,9 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Consumer<UserDataNotifier>(
                   builder: (context, userDataNotifier, _) {
-                    List<UserData> userDataList = userDataNotifier.value;
+                    List<UserData> userDataList = userDataNotifier.allUserDatas;
 
+                    // If no data is fetched. Show 'No user data available'.
                     if (userDataList == null || userDataList.isEmpty) {
                       return Text(
                         'No user data available',
@@ -63,13 +63,10 @@ class HomeScreen extends StatelessWidget {
 
                     final userData = userDataList[0];
 
-                    return Row(
-                      children: [
-                        Text('Name: ${userData.name}', style: TextStyle(color: Colors.black)),
-                        Text('Username: ${userData.username}', style: TextStyle(color: Colors.black)),
-                        Text('Email: ${userData.email}', style: TextStyle(color: Colors.black)),
-                      ],
-                    );
+                    print('The username: ' + userData.username);
+
+                    // Show simple welcome text with the fetched userData.
+                    return Text('Welcome ${userData.name}' + '!', style: TextStyle(color: Colors.black));
                   },
                 ),
                 Text(

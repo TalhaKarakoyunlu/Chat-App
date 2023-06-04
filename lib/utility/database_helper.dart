@@ -44,7 +44,7 @@ class DatabaseHelper {
   // Inserts a new user to Users table with the given parameters.
   Future<Results> insertUser(MySqlConnection conn, String name, String username, String phoneNumber, String email, String password, String? profilePictureURL) async {
 
-     Results result;
+    Results result;
 
      result = await conn.query(
          'insert into users (name, username, phoneNumber, email, password) values (?, ?, ?, ?, ?)',
@@ -67,7 +67,7 @@ class DatabaseHelper {
     return results;
   }
 
-   Future<List<dynamic>> insertUserAndShowUsers(MySqlConnection conn, String name, String username, String phoneNumber, String email, String password, String? profilePictureURL) async {
+   Future<dynamic> insertUserAndShowUsers(MySqlConnection conn, String name, String username, String phoneNumber, String email, String password, String? profilePictureURL) async {
      Results result;
 
      try {
@@ -83,18 +83,15 @@ class DatabaseHelper {
      }
 
      var results = await conn.query(
-       'select name, email from users where id = ?',
+       'select * from users where id = ?',
        [result.insertId],
      );
 
-     List<dynamic> userList = [];
      for (var row in results) {
        print('name: ${row[0]}, email: ${row[1]}');
-       userList.add(row[0]);
      }
 
-     await removeConnection(conn);
-     return userList;
+     return results;
    }
 
 
@@ -108,8 +105,6 @@ class DatabaseHelper {
        print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
      }
 
-     await removeConnection(conn);
-
      return results;
    }
 
@@ -119,8 +114,6 @@ class DatabaseHelper {
      for (var row in results) {
        print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
      }
-
-     await removeConnection(conn);
 
      return results;
    }

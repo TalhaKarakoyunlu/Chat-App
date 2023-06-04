@@ -3,8 +3,12 @@ import 'package:mysql1/mysql1.dart';
 import '../models/user_data.dart';
 import 'database_helper.dart';
 
-class UserDataNotifier extends ValueNotifier<List<UserData>> {
-  UserDataNotifier() : super([]);
+class UserDataNotifier with ChangeNotifier {
+  UserDataNotifier() : super();
+
+  List<UserData> _allUserDatas = [];
+
+  List<UserData> get allUserDatas => _allUserDatas;
 
   bool isEmail(String emailOrUsername) {
     RegExp emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
@@ -28,20 +32,26 @@ class UserDataNotifier extends ValueNotifier<List<UserData>> {
 
     if (conn != null) {
       try {
-        List<dynamic> results =
-        await databaseHelper.insertUserAndShowUsers(conn, name, username, phoneNumber, email, password, null);
-        List<UserData> newData = results
-            .map((row) => UserData(
+        List<dynamic> results = [];
+        Results allResults = await databaseHelper.insertUserAndShowUsers(conn, name, username, phoneNumber, email, password, profilePictureURL);
+
+        results = allResults.toList();
+
+        print(results.first);
+
+        List<UserData> newData = results.map((row) => UserData(
           name: row[1],
           username: row[2],
           phoneNumber: row[3],
           email: row[4],
           password: row[5],
           profilePictureURL: row[6],
-        ))
-            .toList();
+        )).toList();
 
-        value = newData;
+        _allUserDatas = newData;
+
+        print('New data length: ' + newData.length.toString());
+
         notifyListeners();
       } catch (e) {
         print('Error creating user data: $e');
@@ -51,9 +61,8 @@ class UserDataNotifier extends ValueNotifier<List<UserData>> {
     }
   }
 
-
-
-
+  // This method is for finding a user and adding it to UserData model. You can use this to fetch a user with email or username.
+  // {input} in the parameters is either email or username.
   Future<void> updateUserData(String input) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     MySqlConnection? conn = await databaseHelper.createConnection();
@@ -80,7 +89,7 @@ class UserDataNotifier extends ValueNotifier<List<UserData>> {
           profilePictureURL: row[6],
         )).toList();
 
-        value = newData;
+        _allUserDatas = newData;
 
         print('New data length: ' + newData.length.toString());
 
