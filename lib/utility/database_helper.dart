@@ -41,6 +41,7 @@ class DatabaseHelper {
 
   }
 
+  // USERS TABLE
   // Inserts a new user to Users table with the given parameters.
   Future<Results> insertUser(MySqlConnection conn, String name, String username, String phoneNumber, String email, String password, String? profilePictureURL) async {
 
@@ -96,6 +97,15 @@ class DatabaseHelper {
 
 
    //TODO: Add findByPhoneNumber() method.
+  Future<dynamic> findUsersByPhoneNumber(MySqlConnection conn, String phoneNumber) async {
+    var results = await conn.query(
+        'select * from users where phoneNumber = ?', [phoneNumber]);
+    for (var row in results) {
+      print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+    }
+
+    return results;
+  }
 
   // Shows all columns of data for the user with the given username
    Future<dynamic> findUsersByUsername(MySqlConnection conn, String username) async {
@@ -188,6 +198,51 @@ class DatabaseHelper {
 
      return false; // Sign-in failed
    }
+
+   // CONTACTS TABLE
+  Future<void> addContact(int userId, String contactName, String contactPhoneNumber) async {
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      Results contactResults = await findUsersByPhoneNumber(conn!, contactPhoneNumber);
+
+      if (contactResults != null && contactResults.isNotEmpty) {
+        var contactUserId = contactResults.first[0].toString(); // Convert to String
+
+        print('This is the contact user id: $contactUserId');
+
+        await conn.query(
+          'INSERT INTO contacts (user_id, contact_user_id, contact_name) VALUES (?, ?, ?)',
+          [userId, contactUserId, contactName],
+        );
+
+        print('Contact added successfully.');
+      } else {
+        print('No user found with the provided phone number.');
+      }
+    } catch (e) {
+      print('Error adding contact: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    } finally {
+      await removeConnection(conn);
+    }
+  }
+
+
+  Future<dynamic> showContacts(MySqlConnection conn) async {
+    try {
+
+      Results results = await conn.query('SELECT * FROM contacts');
+
+      return results;
+
+    } catch (e) {
+      print('Error showing contacts: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    } finally {
+      removeConnection(conn);
+    }
+  }
 
    // Closes the connection.
    Future<void> removeConnection(MySqlConnection? conn) async {

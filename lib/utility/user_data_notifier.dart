@@ -1,3 +1,4 @@
+import 'package:chat_app/widgets/contact_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import '../models/user_data.dart';
@@ -7,8 +8,10 @@ class UserDataNotifier with ChangeNotifier {
   UserDataNotifier() : super();
 
   List<UserData> _allUserDatas = [];
+  UserData? _signedInUserData;
 
   List<UserData> get allUserDatas => _allUserDatas;
+  UserData? get signedInUserData => _signedInUserData;
 
   bool isEmail(String emailOrUsername) {
     RegExp emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
@@ -40,17 +43,23 @@ class UserDataNotifier with ChangeNotifier {
         print(results.first);
 
         List<UserData> newData = results.map((row) => UserData(
+          id: row[0],
           name: row[1],
           username: row[2],
           phoneNumber: row[3],
           email: row[4],
           password: row[5],
           profilePictureURL: row[6],
+            last_update: row[7]
         )).toList();
 
-        _allUserDatas = newData;
+        if (_allUserDatas.isEmpty) {
+          _signedInUserData = newData.first; // Assign the first UserData object to _signedInUserData
+          _allUserDatas.addAll(newData);
+        }
 
         print('New data length: ' + newData.length.toString());
+        print('All users: ' + _allUserDatas.toString());
 
         notifyListeners();
       } catch (e) {
@@ -81,17 +90,25 @@ class UserDataNotifier with ChangeNotifier {
         }
 
         List<UserData> newData = results.map((row) => UserData(
+          id: row[0],
           name: row[1],
           username: row[2],
           phoneNumber: row[3],
           email: row[4],
           password: row[5],
           profilePictureURL: row[6],
+            last_update: row[7]
         )).toList();
 
-        _allUserDatas = newData;
+        if (_allUserDatas.isEmpty) {
+          _signedInUserData = newData.first; // Assign the first UserData object to _signedInUserData
+          _allUserDatas.addAll(newData); // Append newData to the existing list
+        }
+
 
         print('New data length: ' + newData.length.toString());
+        print('signed in user data ' + _signedInUserData.toString());
+        print('All users: ' + _allUserDatas.toString());
 
         notifyListeners();
       } catch (e) {
@@ -100,5 +117,66 @@ class UserDataNotifier with ChangeNotifier {
         await databaseHelper.removeConnection(conn);
       }
     }
+  }
+
+  Future<void> showUserDataWithPhoneNumber(String phoneNumber) async {
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    MySqlConnection? conn = await databaseHelper.createConnection();
+
+    if (conn != null) {
+      try {
+
+        List<dynamic> results = [];
+
+        Results gotResults = await databaseHelper.findUsersByPhoneNumber(conn, phoneNumber);
+        results = gotResults.toList();
+
+        List<UserData> newData = results.map((row) => UserData(
+          id: row[0],
+          name: row[1],
+          username: row[2],
+          phoneNumber: row[3],
+          email: row[4],
+          password: row[5],
+          profilePictureURL: row[6],
+          last_update: row[7]
+        )).toList();
+
+        _allUserDatas.addAll(newData);
+
+        print('New data phone Number: ' + newData[0].phoneNumber);
+
+        notifyListeners();
+      } catch (e) {
+        print('Error fetching user data: $e');
+      } finally {
+        await databaseHelper.removeConnection(conn);
+      }
+    }
+  }
+
+  Future<void> addNewContact(String phoneNumber, String contactName) async {
+
+    DatabaseHelper databaseHelper = DatabaseHelper();
+    MySqlConnection? conn = await databaseHelper.createConnection();
+
+    if (conn != null) {
+      try {
+
+        int user_id = _signedInUserData!.id;
+
+        await databaseHelper.addContact(user_id, contactName, phoneNumber);
+
+        print('New contact added.');
+
+
+        notifyListeners();
+      } catch (e) {
+        print('Error fetching user data: $e');
+      } finally {
+        await databaseHelper.removeConnection(conn);
+      }
+    }
+
   }
 }

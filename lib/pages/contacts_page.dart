@@ -1,3 +1,4 @@
+import 'package:chat_app/screens/add_contact_screen.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../widgets/contact_widget.dart';
@@ -11,7 +12,9 @@ class ContactsPage extends StatelessWidget {
       children: [
         TextButton(
             onPressed: () {
-              //TODO: Implement adding new contact.
+              Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                return AddContactScreen();
+              }));
             },
             child: Text('Add a new contact.')),
         Expanded(

@@ -1,5 +1,6 @@
 import 'package:chat_app/screens/signup_screen.dart';
 import 'package:chat_app/screens/test_screen.dart';
+import 'package:chat_app/utility/contact_data_notifier.dart';
 import 'package:chat_app/utility/user_data_notifier.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -16,6 +17,9 @@ void main() {
       ChangeNotifierProvider(
       create: (context) => UserDataNotifier(),
     ),
+      ChangeNotifierProvider(
+        create: (context) => ContactDataNotifier(),
+      ),
     ],
     child: MyApp(),
   ),);
