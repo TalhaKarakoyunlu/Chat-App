@@ -40,6 +40,9 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    var signedInUser = context.watch<UserDataNotifier>().signedInUserData;
+
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.transparent,
@@ -49,26 +52,28 @@ class HomeScreen extends StatelessWidget {
           builder: (BuildContext context, String value, _) {
             return Row(
               children: [
-                Consumer<UserDataNotifier>(
-                  builder: (context, userDataNotifier, _) {
-                    List<UserData> userDataList = userDataNotifier.allUserDatas;
-
-                    // If no data is fetched. Show 'No user data available'.
-                    if (userDataList == null || userDataList.isEmpty) {
-                      return Text(
-                        'No user data available',
-                        style: TextStyle(color: Colors.black),
-                      );
-                    }
-
-                    final userData = userDataList[0];
-
-                    print('The username: ' + userData.username);
-
-                    // Show simple welcome text with the fetched userData.
-                    return Text('Welcome ${userData.name}' + '!', style: TextStyle(color: Colors.black));
-                  },
-                ),
+                Text('Welcome ${signedInUser!.name}!', style: TextStyle(color: Colors.black)),
+                // THE LINE ABOVE IS EQUAL TO THIS 20 LINES OF CODE, JUST SO YOU KNOW!!!
+                // Consumer<UserDataNotifier>(
+                //   builder: (context, userDataNotifier, _) {
+                //     List<UserData> userDataList = userDataNotifier.allUserDatas;
+                //
+                //     // If no data is fetched. Show 'No user data available'.
+                //     if (userDataList == null || userDataList.isEmpty) {
+                //       return Text(
+                //         'No user data available',
+                //         style: TextStyle(color: Colors.black),
+                //       );
+                //     }
+                //
+                //     final userData = userDataList[0];
+                //
+                //     print('The username: ' + userData.username);
+                //
+                //     // Show simple welcome text with the fetched userData.
+                //     return Text('Welcome ${userData.name}' + '!', style: TextStyle(color: Colors.black));
+                //   },
+                // ),
                 Text(
                   value,
                   style: TextStyle(

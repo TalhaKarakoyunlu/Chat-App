@@ -11,6 +11,7 @@ class ContactDataNotifier with ChangeNotifier {
   List<ContactData> get contacts => _contacts;
 
   UserDataNotifier userDataNotifier = UserDataNotifier();
+  DatabaseHelper _databaseHelper = DatabaseHelper();
 
   // Future<void> loadContacts() async {
   //   // Load contacts from the database
@@ -69,27 +70,27 @@ class ContactDataNotifier with ChangeNotifier {
 
     if (conn != null) {
       try {
-        await userDataNotifier.updateUserData(signedInUsername);
+        await userDataNotifier.signInUser(signedInUsername);
 
         if (userDataNotifier.signedInUserData != null) {
           int userId = userDataNotifier.signedInUserData!.id;
 
           await databaseHelper.addContact(userId, contactName, phoneNumber);
 
-          Results results = await databaseHelper.showContacts(conn);
+          Results results = await databaseHelper.showContacts();
 
-          if (results.isNotEmpty) {
-            List<ContactData> newData = results.map((row) => ContactData(
-              id: row[0],
-              userId: row[1],
-              contactUserId: row[2],
-              contactName: row[3],
-            )).toList();
-
-            contacts.addAll(newData);
-
-            print('New contact added. Contact name is ' + contacts.first.contactName);
-          }
+          // if (results.isNotEmpty) {
+          //   List<ContactData> newData = results.map((row) => ContactData(
+          //     id: row[0],
+          //     userId: row[1],
+          //     contactUserId: row[2],
+          //     contactCustomName: row[3],
+          //   )).toList();
+          //
+          //   _contacts.addAll(newData);
+          //
+          //   print('New contact added. Contact name is ' + contacts.first.contactCustomName);
+          // }
         } else {
           print('Signed in user data is null.');
         }
@@ -97,14 +98,48 @@ class ContactDataNotifier with ChangeNotifier {
         notifyListeners();
       } catch (e) {
         print('Error fetching user data: $e');
-      } finally {
-        await databaseHelper.removeConnection(conn);
       }
     }
   }
 
+  Future<void> loadContacts(int? userId) async {
+    try {
+      List<ContactData> contacts = [];
+      // Results rows = await _databaseHelper.joinUsersAndContacts(userId);
+      Results rows = await _databaseHelper.showContacts();
 
-// ... other methods for updating or deleting contacts ...
+      for (var row in rows) {
 
-// ...existing code...
+        Results contactRows = await _databaseHelper.findUsersById(row[2]);
+
+        int i=0;
+        for (var contactRow in contactRows) {
+
+          ContactData contact = ContactData(
+            id: row[0],
+            userId: row[1],
+            contactUserId: row[2],
+            contactCustomName: row[3],
+            contactName: contactRow[1],
+            contactUsername: contactRow[2],
+            contactPhoneNumber: contactRow[3],
+            contactImageURL: contactRow[6],
+            contactLastUpdate: contactRow[7]
+          );
+          print('Contact information ${contactRow[i]}');
+          i++;
+          contacts.add(contact);
+        }
+
+      }
+
+      _contacts = contacts;
+      notifyListeners();
+    } catch (e) {
+      print('Error loading contacts: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    }
+  }
+
+
 }

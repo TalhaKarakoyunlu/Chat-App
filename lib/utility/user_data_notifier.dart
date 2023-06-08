@@ -9,9 +9,11 @@ class UserDataNotifier with ChangeNotifier {
 
   List<UserData> _allUserDatas = [];
   UserData? _signedInUserData;
+  int? _signedInUserId = 0;
 
   List<UserData> get allUserDatas => _allUserDatas;
   UserData? get signedInUserData => _signedInUserData;
+  int? get signedInUserId => _signedInUserId;
 
   bool isEmail(String emailOrUsername) {
     RegExp emailRegex = RegExp(r'^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$');
@@ -54,6 +56,7 @@ class UserDataNotifier with ChangeNotifier {
         )).toList();
 
         if (_allUserDatas.isEmpty) {
+          _signedInUserId = newData[0].id;
           _signedInUserData = newData.first; // Assign the first UserData object to _signedInUserData
           _allUserDatas.addAll(newData);
         }
@@ -72,7 +75,7 @@ class UserDataNotifier with ChangeNotifier {
 
   // This method is for finding a user and adding it to UserData model. You can use this to fetch a user with email or username.
   // {input} in the parameters is either email or username.
-  Future<void> updateUserData(String input) async {
+  Future<void> signInUser(String input) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     MySqlConnection? conn = await databaseHelper.createConnection();
 
@@ -81,11 +84,11 @@ class UserDataNotifier with ChangeNotifier {
         List<dynamic> results = [];
         if (isEmail(input)) {
           // Input is email.
-          Results emailResults = await databaseHelper.findUsersByEmail(conn, input);
+          Results emailResults = await databaseHelper.findUsersByEmail(input);
           results = emailResults.toList();
         } else {
           // Input is username.
-          Results usernameResults = await databaseHelper.findUsersByUsername(conn, input);
+          Results usernameResults = await databaseHelper.findUsersByUsername(input);
           results = usernameResults.toList();
         }
 
@@ -128,7 +131,7 @@ class UserDataNotifier with ChangeNotifier {
 
         List<dynamic> results = [];
 
-        Results gotResults = await databaseHelper.findUsersByPhoneNumber(conn, phoneNumber);
+        Results gotResults = await databaseHelper.findUsersByPhoneNumber(phoneNumber);
         results = gotResults.toList();
 
         List<UserData> newData = results.map((row) => UserData(
@@ -155,28 +158,28 @@ class UserDataNotifier with ChangeNotifier {
     }
   }
 
-  Future<void> addNewContact(String phoneNumber, String contactName) async {
-
-    DatabaseHelper databaseHelper = DatabaseHelper();
-    MySqlConnection? conn = await databaseHelper.createConnection();
-
-    if (conn != null) {
-      try {
-
-        int user_id = _signedInUserData!.id;
-
-        await databaseHelper.addContact(user_id, contactName, phoneNumber);
-
-        print('New contact added.');
-
-
-        notifyListeners();
-      } catch (e) {
-        print('Error fetching user data: $e');
-      } finally {
-        await databaseHelper.removeConnection(conn);
-      }
-    }
-
-  }
+  // Future<void> addNewContact(String phoneNumber, String contactName) async {
+  //
+  //   DatabaseHelper databaseHelper = DatabaseHelper();
+  //   MySqlConnection? conn = await databaseHelper.createConnection();
+  //
+  //   if (conn != null) {
+  //     try {
+  //
+  //       int user_id = _signedInUserData!.id;
+  //
+  //       await databaseHelper.addContact(user_id, contactName, phoneNumber);
+  //
+  //       print('New contact added.');
+  //
+  //
+  //       notifyListeners();
+  //     } catch (e) {
+  //       print('Error fetching user data: $e');
+  //     } finally {
+  //       await databaseHelper.removeConnection(conn);
+  //     }
+  //   }
+  //
+  // }
 }

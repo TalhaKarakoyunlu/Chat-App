@@ -25,7 +25,7 @@ class _TestScreenState extends State<TestScreen> {
     DatabaseHelper db = DatabaseHelper();
 
     db.createConnection().then((conn) {
-      db.findUsersByUsername(conn!, 'PhoneEater');
+      db.findUsersByUsername('PhoneEater');
 
       // Codes for inserting a user, then showing it with showUsers() method.
       // db.insertUser(conn!, 'Recep', 'PhoneEater', '05551114422', 'recep@gmail.com', 'HeyDon\'tTellAnyone').then((result) {

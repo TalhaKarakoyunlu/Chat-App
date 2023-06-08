@@ -16,6 +16,9 @@ class AddContactScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+  var signedInUser = context.watch<UserDataNotifier>().signedInUserData;
+
     return Scaffold(
       body: Center(
         child: SizedBox(
@@ -47,8 +50,9 @@ class AddContactScreen extends StatelessWidget {
                   phoneNumber = phoneNumberController.text;
                   contactName = contactNameController.text;
 
-                  var contactDataNotifier = Provider.of<ContactDataNotifier>(context, listen: false);
-                  await contactDataNotifier.addNewContact('Reco546', phoneNumber, contactName);
+                  await context.read<ContactDataNotifier>().addNewContact(signedInUser!.username, phoneNumber, contactName);
+
+                  await context.read<ContactDataNotifier>().loadContacts(signedInUser.id);
 
                   Navigator.pop(context);
                 },

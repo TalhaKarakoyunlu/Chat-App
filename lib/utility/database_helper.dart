@@ -95,37 +95,86 @@ class DatabaseHelper {
      return results;
    }
 
+  Future<dynamic> findUsersById(int id) async {
 
-   //TODO: Add findByPhoneNumber() method.
-  Future<dynamic> findUsersByPhoneNumber(MySqlConnection conn, String phoneNumber) async {
-    var results = await conn.query(
-        'select * from users where phoneNumber = ?', [phoneNumber]);
-    for (var row in results) {
-      print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      var results = await conn!.query(
+          'select * from users where id = ?', [id]);
+      for (var row in results) {
+        print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+      }
+
+      return results;
+    } catch (e) {
+      print('Error checking sign-in credentials: $e');
+    } finally {
+      await removeConnection(conn);
     }
 
-    return results;
+  }
+
+   //TODO: Add findByPhoneNumber() method.
+  Future<dynamic> findUsersByPhoneNumber(String phoneNumber) async {
+
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      var results = await conn!.query(
+          'select * from users where phoneNumber = ?', [phoneNumber]);
+      for (var row in results) {
+        print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+      }
+
+      return results;
+    } catch (e) {
+      print('Error checking sign-in credentials: $e');
+    } finally {
+      await removeConnection(conn);
+    }
+
   }
 
   // Shows all columns of data for the user with the given username
-   Future<dynamic> findUsersByUsername(MySqlConnection conn, String username) async {
-     var results = await conn.query(
-         'select * from users where username = ?', [username]);
-     for (var row in results) {
-       print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+   Future<dynamic> findUsersByUsername(String username) async {
+
+     MySqlConnection? conn = await createConnection();
+
+     try {
+       var results = await conn!.query(
+           'select * from users where username = ?', [username]);
+       for (var row in results) {
+         print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+       }
+
+       return results;
+     } catch (e) {
+       print('Error checking sign-in credentials: $e');
+     } finally {
+       await removeConnection(conn);
      }
 
-     return results;
    }
 
-   Future<dynamic> findUsersByEmail(MySqlConnection conn, String email) async {
-     var results = await conn.query(
-         'select * from users where email = ?', [email]);
-     for (var row in results) {
-       print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+   Future<dynamic> findUsersByEmail(String email) async {
+
+     MySqlConnection? conn = await createConnection();
+
+     try {
+       var results = await conn!.query(
+           'select * from users where email = ?', [email]);
+       for (var row in results) {
+         print('id: ${row[0]}, name: ${row[1]}, username: ${row[2]}, phoneNumber: ${row[3]}, email: ${row[4]}, password: ${row[5]}, profile_picture_url: ${row[6]}, last_update: ${row[7]}');
+       }
+
+       return results;
+     } catch (e) {
+       print('Error checking sign-in credentials: $e');
+     } finally {
+       await removeConnection(conn);
      }
 
-     return results;
    }
 
    // TODO: Add update methods.
@@ -174,10 +223,10 @@ class DatabaseHelper {
          Results results;
          if (isEmail(emailOrUsername)) {
            // Input is email.
-           results = await findUsersByEmail(conn, emailOrUsername);
+           results = await findUsersByEmail(emailOrUsername);
          } else {
            // Input is username.
-           results = await findUsersByUsername(conn, emailOrUsername);
+           results = await findUsersByUsername(emailOrUsername);
          }
 
          if (results.isNotEmpty) {
@@ -204,14 +253,14 @@ class DatabaseHelper {
     MySqlConnection? conn = await createConnection();
 
     try {
-      Results contactResults = await findUsersByPhoneNumber(conn!, contactPhoneNumber);
+      Results contactResults = await findUsersByPhoneNumber(contactPhoneNumber);
 
       if (contactResults != null && contactResults.isNotEmpty) {
         var contactUserId = contactResults.first[0].toString(); // Convert to String
 
         print('This is the contact user id: $contactUserId');
 
-        await conn.query(
+        await conn!.query(
           'INSERT INTO contacts (user_id, contact_user_id, contact_name) VALUES (?, ?, ?)',
           [userId, contactUserId, contactName],
         );
@@ -229,10 +278,12 @@ class DatabaseHelper {
   }
 
 
-  Future<dynamic> showContacts(MySqlConnection conn) async {
-    try {
+  Future<dynamic> showContacts() async {
 
-      Results results = await conn.query('SELECT * FROM contacts');
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      Results results = await conn!.query('SELECT * FROM contacts');
 
       return results;
 
@@ -243,6 +294,29 @@ class DatabaseHelper {
       removeConnection(conn);
     }
   }
+
+  Future<dynamic> joinUsersAndContacts(int? userId) async {
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      Results results = await conn!.query('SELECT * FROM users JOIN contacts ON ${userId} = contacts.user_id');
+
+      for (var row in results) {
+        print('Row 1: ${row[2]}');
+      }
+
+
+      return results;
+
+    } catch (e) {
+      print('Error joining tables: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    } finally {
+      removeConnection(conn);
+    }
+  }
+
+
 
    // Closes the connection.
    Future<void> removeConnection(MySqlConnection? conn) async {

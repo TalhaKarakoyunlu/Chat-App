@@ -56,7 +56,7 @@ class SigninScreen extends StatelessWidget {
 
     if (isSignInSuccessful) {
       // Example of updating user data in UserDataNotifier
-      userDataNotifier.updateUserData(emailOrUsername);
+      userDataNotifier.signInUser(emailOrUsername);
 
       // Example of navigating to the home screen with the updated user data
       Navigator.of(context).push(
@@ -88,6 +88,7 @@ class SigninScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     // TODO: Improve the UI design.
+    var allUserDatas = context.watch<UserDataNotifier>().allUserDatas;
 
     return Scaffold(
       body: Center(
@@ -126,9 +127,7 @@ class SigninScreen extends StatelessWidget {
                     if (passwordController.text.isNotEmpty) {
                       if (passwordController.text.length > 5) {
 
-                        var userDataNotifier = Provider.of<UserDataNotifier>(context, listen: false);
-                        await userDataNotifier.updateUserData(emailOrUsername);
-                        List<UserData> allUserDatas = userDataNotifier.allUserDatas;
+                        await context.read<UserDataNotifier>().signInUser(emailOrUsername);
 
                             bool isEmailInput = isEmail(emailOrUsername);
 

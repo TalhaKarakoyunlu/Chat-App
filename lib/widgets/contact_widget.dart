@@ -44,7 +44,7 @@ class ContactWidget extends StatelessWidget {
           ),
           IconButton(
               onPressed: () {
-                //TODO: Implement adding a totally different user to contacts.
+                //TODO: Implement calling.
               },
               icon: Icon(Icons.call, size: 20, color: Colors.black54,)),
         ],
