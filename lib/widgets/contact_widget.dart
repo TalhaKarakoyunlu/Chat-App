@@ -1,22 +1,24 @@
-import 'package:chat_app/screens/contact_details_screen.dart';
-import 'package:chat_app/screens/conversation.dart';
 import 'package:flutter/material.dart';
 
+import '../screens/contact_details_screen.dart';
+import '../screens/conversation.dart';
 import 'avatar.dart';
 
 const contactsTextStyle = TextStyle(
-    color: Colors.black54,
-    fontWeight: FontWeight.w600,
-    fontSize: 20
+  overflow: TextOverflow.ellipsis,
+  fontSize: 18,
+  letterSpacing: 0.3,
+  wordSpacing: 1.7,
+  fontWeight: FontWeight.w500,
 );
 
 class ContactWidget extends StatelessWidget {
-  const ContactWidget({
-    Key? key,
-    required this.imageURL,
-    required this.contactCustomName,
-    required this.contactPhoneNumber
-  }) : super(key: key);
+  const ContactWidget(
+      {Key? key,
+      required this.imageURL,
+      required this.contactCustomName,
+      required this.contactPhoneNumber})
+      : super(key: key);
 
   final String imageURL;
   final String contactCustomName;
@@ -41,23 +43,33 @@ class ContactWidget extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Avatar.small(
-              url:
-              imageURL,
+              url: imageURL,
             ),
             Column(
               children: [
-                Text(contactCustomName, style: contactsTextStyle,),
-                Text(contactPhoneNumber, style: contactsTextStyle,)
+                Text(
+                  contactCustomName,
+                  style: contactsTextStyle,
+                ),
+                Text(
+                  contactPhoneNumber,
+                  style: contactsTextStyle,
+                )
               ],
             ),
             IconButton(
                 onPressed: () {
                   //TODO: Implement messaging.
-                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                  Navigator.of(context)
+                      .push(MaterialPageRoute(builder: (context) {
                     return ConversationPage(theme: "light");
                   }));
                 },
-                icon: Icon(Icons.message, size: 20, color: Colors.black54,)),
+                icon: Icon(
+                  Icons.message,
+                  size: 20,
+                  color: Colors.black54,
+                )),
           ],
         ),
       ),

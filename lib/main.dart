@@ -13,16 +13,17 @@ void main() {
   SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
   runApp(
     MultiProvider(
-    providers: [
-      ChangeNotifierProvider(
-      create: (context) => UserDataNotifier(),
+      providers: [
+        ChangeNotifierProvider(
+          create: (context) => UserDataNotifier(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => ContactDataNotifier(),
+        ),
+      ],
+      child: MyApp(),
     ),
-      ChangeNotifierProvider(
-        create: (context) => ContactDataNotifier(),
-      ),
-    ],
-    child: MyApp(),
-  ),);
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -32,12 +33,12 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
+      title: "Tema moment",
+      theme: ThemeData.light(),
+      darkTheme: ThemeData.dark(),
+      themeMode: ThemeMode
+          .dark, // TEMAYI DEĞİŞTİRMEK İÇİN BUNU "ThemeMode.light" YA DA "ThemeMode.dark" YAP
       debugShowCheckedModeBanner: false,
       home: const SignupScreen(),
       ////////////////////////////////////////////// USE THESE FOR NAVIGATING ///////////////////////////////////////////////////

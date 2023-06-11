@@ -4,10 +4,14 @@ import 'package:chat_app/pages/messages_page.dart';
 import 'package:chat_app/pages/notifications_page.dart';
 import 'package:chat_app/utility/database_helper.dart';
 import 'package:chat_app/utility/user_data_notifier.dart';
+import 'package:chat_app/utility/database_helper.dart';
+import 'package:chat_app/utility/user_data_notifier.dart';
+import 'package:chat_app/widgets/glowing_action_button.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
 import '../helpers.dart';
 import '../models/user_data.dart';
 import '../theme.dart';
@@ -18,6 +22,7 @@ class HomeScreen extends StatelessWidget {
 
   final ValueNotifier<int> pageIndex = ValueNotifier(0);
   final ValueNotifier<String> title = ValueNotifier("Messages");
+  UserDataNotifier? userDataNotifier;
 
   final pages = const [
     MessagesPage(),
@@ -40,7 +45,6 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     var signedInUser = context.watch<UserDataNotifier>().signedInUserData;
 
     return Scaffold(
@@ -54,7 +58,11 @@ class HomeScreen extends StatelessWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 0.0),
-                  child: Text('Welcome ${signedInUser!.name}!', style: TextStyle(color: Colors.black), overflow: TextOverflow.ellipsis,),
+                  child: Text(
+                    'Welcome ${signedInUser!.name}!',
+                    style: TextStyle(color: Colors.black),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
                 // THE LINE ABOVE IS EQUAL TO THIS 20 LINES OF CODE, JUST SO YOU KNOW!!!
                 // Consumer<UserDataNotifier>(
@@ -80,6 +88,15 @@ class HomeScreen extends StatelessWidget {
               ],
             );
           },
+        ),
+        leading: Align(
+          alignment: Alignment.centerRight,
+          child: IconBackground(
+            icon: Icons.search_outlined,
+            onTap: () {
+              print("TODO search function");
+            },
+          ),
         ),
         actions: [
           Padding(
@@ -124,41 +141,64 @@ class _BottomNavigationBarState extends State<_BottomNavigationBar> {
 
   @override
   Widget build(BuildContext context) {
-    return SafeArea(
-      top: false,
-      bottom: true,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: [
-          _NavigationBarItem(
-            label: "Message",
-            icon: CupertinoIcons.bubble_left_bubble_right_fill,
-            index: 0,
-            onTap: handleItemSelected,
-            isSelected: (selectedIndex == 0),
+    final brightness = Theme.of(context).brightness;
+    return Card(
+      color: (brightness == Brightness.light) ? Colors.transparent : null,
+      elevation: 0,
+      margin: const EdgeInsets.all(0),
+      child: SafeArea(
+        top: false,
+        bottom: true,
+        child: Padding(
+          padding: const EdgeInsets.only(
+            top: 16,
+            left: 8,
+            right: 8,
           ),
-          _NavigationBarItem(
-            label: "Notifications",
-            icon: CupertinoIcons.bell_fill,
-            index: 1,
-            onTap: handleItemSelected,
-            isSelected: (selectedIndex == 1),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: [
+              _NavigationBarItem(
+                label: "Message",
+                icon: CupertinoIcons.bubble_left_bubble_right_fill,
+                index: 0,
+                onTap: handleItemSelected,
+                isSelected: (selectedIndex == 0),
+              ),
+              _NavigationBarItem(
+                label: "Notifications",
+                icon: CupertinoIcons.bell_fill,
+                index: 1,
+                onTap: handleItemSelected,
+                isSelected: (selectedIndex == 1),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8, right: 8, bottom: 16),
+                child: GlowingActionButton(
+                  color: AppColors.secondary,
+                  icon: CupertinoIcons.add,
+                  onPressed: () {
+                    print("TODO on new message");
+                  },
+                ),
+              ),
+              _NavigationBarItem(
+                label: "Calls",
+                icon: CupertinoIcons.phone_fill,
+                index: 2,
+                onTap: handleItemSelected,
+                isSelected: (selectedIndex == 2),
+              ),
+              _NavigationBarItem(
+                label: "Contacts",
+                icon: CupertinoIcons.person_2_fill,
+                index: 3,
+                onTap: handleItemSelected,
+                isSelected: (selectedIndex == 3),
+              ),
+            ],
           ),
-          _NavigationBarItem(
-            label: "Calls",
-            icon: CupertinoIcons.phone_fill,
-            index: 2,
-            onTap: handleItemSelected,
-            isSelected: (selectedIndex == 2),
-          ),
-          _NavigationBarItem(
-            label: "Contacts",
-            icon: CupertinoIcons.person_2_fill,
-            index: 3,
-            onTap: handleItemSelected,
-            isSelected: (selectedIndex == 3),
-          ),
-        ],
+        ),
       ),
     );
   }
@@ -188,28 +228,31 @@ class _NavigationBarItem extends StatelessWidget {
         onTap(index);
       },
       child: SizedBox(
-        height: 65,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
-              size: isSelected ? 24 : 20,
-              color: isSelected ? AppColors.secondary : null,
-            ),
-            const SizedBox(
-              height: 8,
-            ),
-            Text(
-              label,
-              style: isSelected
-                  ? const TextStyle(
-                      fontSize: 16,
-                      color: AppColors.secondary,
-                      fontWeight: FontWeight.bold)
-                  : const TextStyle(fontSize: 12),
-            ),
-          ],
+        width: 70,
+        child: Padding(
+          padding: const EdgeInsets.only(bottom: 8.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                icon,
+                size: isSelected ? 26 : 20,
+                color: isSelected ? AppColors.secondary : null,
+              ),
+              const SizedBox(
+                height: 8,
+              ),
+              Text(
+                label,
+                style: isSelected
+                    ? const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.secondary,
+                        fontWeight: FontWeight.bold)
+                    : const TextStyle(fontSize: 11),
+              ),
+            ],
+          ),
         ),
       ),
     );

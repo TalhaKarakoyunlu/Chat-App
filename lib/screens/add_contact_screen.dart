@@ -1,8 +1,10 @@
 import 'package:chat_app/utility/contact_data_notifier.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../utility/user_data_notifier.dart';
+import '../widgets/icon_buttons.dart';
 
 class AddContactScreen extends StatelessWidget {
   AddContactScreen({super.key});
@@ -13,11 +15,9 @@ class AddContactScreen extends StatelessWidget {
   String contactName = '';
   String phoneNumber = '';
 
-
   @override
   Widget build(BuildContext context) {
-
-  var signedInUser = context.watch<UserDataNotifier>().signedInUserData;
+    var signedInUser = context.watch<UserDataNotifier>().signedInUserData;
 
     return Scaffold(
       body: Center(
@@ -38,9 +38,8 @@ class AddContactScreen extends StatelessWidget {
               TextField(
                 controller: phoneNumberController,
                 autocorrect: false,
-                decoration: InputDecoration(
-                    label: Text('Enter contact phone number.')
-                ),
+                decoration:
+                    InputDecoration(label: Text('Enter contact phone number.')),
                 textInputAction: TextInputAction.next,
               ),
               TextButton(
@@ -50,9 +49,12 @@ class AddContactScreen extends StatelessWidget {
                   phoneNumber = phoneNumberController.text;
                   contactName = contactNameController.text;
 
-                  await context.read<ContactDataNotifier>().addNewContact(signedInUser!.username, phoneNumber, contactName);
+                  await context.read<ContactDataNotifier>().addNewContact(
+                      signedInUser!.username, phoneNumber, contactName);
 
-                  await context.read<ContactDataNotifier>().loadContacts(signedInUser.id);
+                  await context
+                      .read<ContactDataNotifier>()
+                      .loadContacts(signedInUser.id);
 
                   Navigator.pop(context);
                 },

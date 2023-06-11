@@ -20,7 +20,7 @@ class _ConversationPageState extends State<ConversationPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor:
-          widget.theme == "light" ? Themes.bodyLight : Themes.bodyDark,
+          widget.theme == "light" ? Themes.bodyDark : Themes.bodyLight,
       body: Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
