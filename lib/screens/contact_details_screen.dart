@@ -1,3 +1,5 @@
+import 'package:chat_app/models/contact_data.dart';
+import 'package:chat_app/utility/contact_data_notifier.dart';
 import 'package:chat_app/theme.dart';
 import 'package:chat_app/widgets/avatar.dart';
 import 'package:chat_app/widgets/contact_widget_button.dart';
@@ -5,18 +7,29 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../widgets/icon_buttons.dart';
+const contactCustomNameTextStyle = TextStyle(
+  fontSize: 30,
+  color: Colors.blue,
+  fontWeight: FontWeight.bold
+);
 
-const contactNameTextStyle =
-    TextStyle(fontSize: 30, color: Colors.blue, fontWeight: FontWeight.bold);
-
-const contactUserNameTextStyle = TextStyle(color: Colors.black, fontSize: 15.0);
+const contactNameTextStyle = TextStyle(
+    color: Colors.black,
+    fontSize: 15.0
+);
 
 class ContactDetailsScreen extends StatelessWidget {
-  const ContactDetailsScreen({super.key});
+
+  const ContactDetailsScreen({required this.contactName, required this.contactPhoneNumber});
+
+  final String contactName;
+  final String contactPhoneNumber;
 
   @override
   Widget build(BuildContext context) {
+
+    ContactData? contact = context.read<ContactDataNotifier>().findContactByPhoneNumber(contactPhoneNumber);
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: Theme.of(context).iconTheme,
@@ -60,7 +73,7 @@ class ContactDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Padding(
+            TextButton(onPressed: () {}, child: Text('Get User Information')),Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
               child: Column(
@@ -74,15 +87,15 @@ class ContactDetailsScreen extends StatelessWidget {
                     height: 20.0,
                   ),
                   Text(
-                    'Contact Name',
-                    style: contactNameTextStyle,
+                    contactName,
+                    style: contactCustomNameTextStyle,
                   ),
                   SizedBox(
                     height: 20.0,
                   ),
                   Text(
-                    '@User Username',
-                    style: contactUserNameTextStyle,
+                    contact!.contactName,
+                    style: contactNameTextStyle,
                   ),
                 ],
               ),
@@ -130,13 +143,17 @@ class ContactDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 ListTile(
+                leading: Icon(Icons.person),
+                title: Text(contact.contactUsername),
+                subtitle: Text('Username'),
+              ),ListTile(
                   leading: Icon(Icons.email),
-                  title: Text('example@gmail.com'),
+                  title: Text(contact.contactEmail),
                   subtitle: Text('Email'),
                 ),
                 ListTile(
                   leading: Icon(Icons.phone),
-                  title: Text('05551112233'),
+                  title: Text(contact.contactPhoneNumber),
                   subtitle: Text('Phone Number'),
                 ),
               ],
@@ -147,3 +164,4 @@ class ContactDetailsScreen extends StatelessWidget {
     );
   }
 }
+
