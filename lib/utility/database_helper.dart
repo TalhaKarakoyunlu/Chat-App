@@ -316,6 +316,22 @@ class DatabaseHelper {
     }
   }
 
+  Future<dynamic> getContactDetailsByID(int? contactID) async {
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      Results results = await findUsersById(contactID!);
+
+      return results;
+
+    } catch (e) {
+      print('Error finding username with ID: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    } finally {
+      removeConnection(conn);
+    }
+  }
+
 
 
    // Closes the connection.

@@ -123,6 +123,7 @@ class ContactDataNotifier with ChangeNotifier {
             contactName: contactRow[1],
             contactUsername: contactRow[2],
             contactPhoneNumber: contactRow[3],
+            contactEmail: contactRow[4],
             contactImageURL: contactRow[6],
             contactLastUpdate: contactRow[7]
           );
@@ -139,6 +140,33 @@ class ContactDataNotifier with ChangeNotifier {
       print('Error loading contacts: $e');
       // Handle the error appropriately (e.g., log the error, display an error message).
     }
+  }
+
+  ContactData? findContactByID(int contactID) {
+    for (ContactData contact in _contacts) {
+      if (contact.id == contactID) {  // Replace "getID()" with your actual ID property
+        return contact;
+      }
+    }
+    return null;
+  }
+
+  ContactData? findContactByUsername(String contactUsername) {
+    for (ContactData contact in _contacts) {
+      if (contact.contactUsername == contactUsername) {  // Replace "getID()" with your actual ID property
+        return contact;
+      }
+    }
+    return null;
+  }
+
+  ContactData? findContactByPhoneNumber(String phoneNumber) {
+    for (ContactData contact in _contacts) {
+      if (contact.contactPhoneNumber == phoneNumber) {  // Replace "getID()" with your actual ID property
+        return contact;
+      }
+    }
+    return null;
   }
 
 

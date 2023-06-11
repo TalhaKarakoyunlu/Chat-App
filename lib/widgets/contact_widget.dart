@@ -24,10 +24,11 @@ class ContactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     return GestureDetector(
       onTap: () {
         Navigator.of(context).push(MaterialPageRoute(builder: (context) {
-          return ContactDetailsScreen();
+          return ContactDetailsScreen(contactName: contactCustomName, contactPhoneNumber: contactPhoneNumber,);
         }));
       },
       child: Container(
