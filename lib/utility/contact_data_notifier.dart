@@ -8,9 +8,13 @@ import 'secrets.dart';
 
 class ContactDataNotifier with ChangeNotifier {
   List<ContactData> _contacts = [];
+  ContactData? _currentContactData;
+
   List<ContactData> get contacts => _contacts;
+  ContactData? get currentContactData => _currentContactData;
   UserDataNotifier userDataNotifier = UserDataNotifier();
   DatabaseHelper _databaseHelper = DatabaseHelper();
+
   // Future<void> loadContacts() async {
   //   // Load contacts from the database
   //   DatabaseHelper databaseHelper = DatabaseHelper();
@@ -165,5 +169,28 @@ class ContactDataNotifier with ChangeNotifier {
       }
     }
     return null;
+  }
+
+  Future<void> updateContactName(
+      ContactData contact, String newContactName) async {
+    try {
+      // Update the contact's name
+      contact.contactName = newContactName;
+
+      // Update the contact's name in the database
+      await _databaseHelper.updateContactName(
+        contact.userId,
+        contact.contactPhoneNumber,
+        newContactName,
+      );
+
+      // Update the contact data in the notifier
+      _currentContactData = contact;
+
+      notifyListeners();
+    } catch (e) {
+      print('Error updating contact name: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    }
   }
 }

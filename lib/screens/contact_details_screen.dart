@@ -1,30 +1,43 @@
-import 'package:chat_app/models/contact_data.dart';
-import 'package:chat_app/utility/contact_data_notifier.dart';
-import 'package:chat_app/theme.dart';
-import 'package:chat_app/widgets/avatar.dart';
-import 'package:chat_app/widgets/contact_widget_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../models/contact_data.dart';
+import '../utility/contact_data_notifier.dart';
+import '../utility/database_helper.dart';
+import '../theme.dart';
+import '../widgets/avatar.dart';
+import '../widgets/contact_widget_button.dart';
 import '../widgets/icon_buttons.dart';
 
-const contactCustomNameTextStyle =
-    TextStyle(fontSize: 30, color: Colors.blue, fontWeight: FontWeight.bold);
+const contactCustomNameTextStyle = TextStyle(
+  fontSize: 30,
+  color: Colors.blue,
+  fontWeight: FontWeight.bold,
+);
 
-const contactNameTextStyle = TextStyle(color: Colors.black, fontSize: 15.0);
+const contactNameTextStyle = TextStyle(
+  color: Colors.black,
+  fontSize: 15.0,
+);
 
 class ContactDetailsScreen extends StatelessWidget {
-  const ContactDetailsScreen(
-      {super.key, required this.contactName, required this.contactPhoneNumber});
+  const ContactDetailsScreen({
+    Key? key,
+    required this.contactName,
+    required this.contactPhoneNumber,
+  }) : super(key: key);
 
   final String contactName;
   final String contactPhoneNumber;
 
   @override
   Widget build(BuildContext context) {
-    ContactData? contact = context
-        .read<ContactDataNotifier>()
-        .findContactByPhoneNumber(contactPhoneNumber);
+    final contactDataNotifier = context.watch<ContactDataNotifier>();
+    final contact =
+        contactDataNotifier.findContactByPhoneNumber(contactPhoneNumber);
+
+    final TextEditingController _contactNameController =
+        TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -49,7 +62,45 @@ class ContactDetailsScreen extends StatelessWidget {
             child: Center(
               child: IconBorder(
                 icon: Icons.edit,
-                onTap: () {},
+                onTap: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => AlertDialog(
+                      title: Text('Update Contact Name'),
+                      content: TextField(
+                        controller: _contactNameController,
+                        decoration: InputDecoration(
+                          labelText: 'New Name',
+                        ),
+                      ),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            // Get the new contact name from the text field
+                            String newContactName = _contactNameController.text;
+                            if (newContactName.isNotEmpty) {
+                              // Get the current contact data
+                              ContactData? currentContact =
+                                  contactDataNotifier.currentContactData;
+
+                              if (currentContact != null) {
+                                // Call the updateContactName method
+                                contactDataNotifier.updateContactName(
+                                  currentContact,
+                                  newContactName,
+                                );
+                              }
+
+                              // Close the dialog
+                              Navigator.of(context).pop();
+                            }
+                          },
+                          child: Text('Update'),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
           ),
@@ -69,7 +120,10 @@ class ContactDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextButton(onPressed: () {}, child: Text('Get User Information')),
+            TextButton(
+              onPressed: () {},
+              child: Text('Get User Information'),
+            ),
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
@@ -91,7 +145,7 @@ class ContactDetailsScreen extends StatelessWidget {
                     height: 20.0,
                   ),
                   Text(
-                    contact!.contactName,
+                    contact?.contactName ?? '',
                     style: contactNameTextStyle,
                   ),
                 ],
@@ -109,17 +163,20 @@ class ContactDetailsScreen extends StatelessWidget {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   ContactWidgetButton(
-                      buttonIcon: Icon(Icons.call),
-                      buttonName: 'Call',
-                      buttonAction: () {}),
+                    buttonIcon: Icon(Icons.call),
+                    buttonName: 'Call',
+                    buttonAction: () {},
+                  ),
                   ContactWidgetButton(
-                      buttonIcon: Icon(Icons.message),
-                      buttonName: 'Message',
-                      buttonAction: () {}),
+                    buttonIcon: Icon(Icons.message),
+                    buttonName: 'Message',
+                    buttonAction: () {},
+                  ),
                   ContactWidgetButton(
-                      buttonIcon: Icon(Icons.email),
-                      buttonName: 'Email',
-                      buttonAction: () {}),
+                    buttonIcon: Icon(Icons.email),
+                    buttonName: 'Email',
+                    buttonAction: () {},
+                  ),
                 ],
               ),
             ),
@@ -141,21 +198,21 @@ class ContactDetailsScreen extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text(contact.contactUsername),
+                  title: Text(contact?.contactUsername ?? ''),
                   subtitle: Text('Username'),
                 ),
                 ListTile(
                   leading: Icon(Icons.email),
-                  title: Text(contact.contactEmail),
+                  title: Text(contact?.contactEmail ?? ''),
                   subtitle: Text('Email'),
                 ),
                 ListTile(
                   leading: Icon(Icons.phone),
-                  title: Text(contact.contactPhoneNumber),
+                  title: Text(contact?.contactPhoneNumber ?? ''),
                   subtitle: Text('Phone Number'),
                 ),
               ],
-            )
+            ),
           ],
         ),
       ),

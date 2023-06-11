@@ -3,7 +3,7 @@ class ContactData {
   final int userId;
   final int contactUserId;
   final String contactCustomName;
-  final String contactName;
+  late final String contactName;
   final String contactUsername;
   final String contactPhoneNumber;
   final String contactEmail;

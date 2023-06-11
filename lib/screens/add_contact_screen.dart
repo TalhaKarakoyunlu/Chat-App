@@ -20,6 +20,22 @@ class AddContactScreen extends StatelessWidget {
     var signedInUser = context.watch<UserDataNotifier>().signedInUserData;
 
     return Scaffold(
+      appBar: AppBar(
+        iconTheme: Theme.of(context).iconTheme,
+        centerTitle: false,
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leadingWidth: 54,
+        leading: Align(
+          alignment: Alignment.centerRight,
+          child: IconBackground(
+            icon: CupertinoIcons.back,
+            onTap: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
+      ),
       body: Center(
         child: SizedBox(
           width: 250,

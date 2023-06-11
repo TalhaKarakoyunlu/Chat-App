@@ -324,4 +324,35 @@ class DatabaseHelper {
       await conn.close();
     }
   }
+
+  Future<void> updateContactName(
+    int userId,
+    String contactPhoneNumber,
+    String newContactName,
+  ) async {
+    MySqlConnection? conn = await createConnection();
+
+    try {
+      Results contactResults = await findUsersByPhoneNumber(contactPhoneNumber);
+
+      if (contactResults != null && contactResults.isNotEmpty) {
+        var contactUserId =
+            contactResults.first[0].toString(); // Convert to String
+
+        await conn!.query(
+          'UPDATE contacts SET contact_name = ? WHERE user_id = ? AND contact_user_id = ?',
+          [newContactName, userId, contactUserId],
+        );
+
+        print('Contact name updated successfully.');
+      } else {
+        print('No contact found with the provided phone number.');
+      }
+    } catch (e) {
+      print('Error updating contact name: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    } finally {
+      await removeConnection(conn);
+    }
+  }
 }
