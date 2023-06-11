@@ -52,7 +52,10 @@ class HomeScreen extends StatelessWidget {
           builder: (BuildContext context, String value, _) {
             return Row(
               children: [
-                Text('Welcome ${signedInUser!.name}!', style: TextStyle(color: Colors.black)),
+                Padding(
+                  padding: const EdgeInsets.only(left: 0.0),
+                  child: Text('Welcome ${signedInUser!.name}!', style: TextStyle(color: Colors.black), overflow: TextOverflow.ellipsis,),
+                ),
                 // THE LINE ABOVE IS EQUAL TO THIS 20 LINES OF CODE, JUST SO YOU KNOW!!!
                 // Consumer<UserDataNotifier>(
                 //   builder: (context, userDataNotifier, _) {
@@ -74,21 +77,17 @@ class HomeScreen extends StatelessWidget {
                 //     return Text('Welcome ${userData.name}' + '!', style: TextStyle(color: Colors.black));
                 //   },
                 // ),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
               ],
             );
           },
         ),
         actions: [
-          Avatar.small(
-            url:
-                "https://talhakarakoyunlu.github.io/cv/images/talha%20profile%20picture.png",
+          Padding(
+            padding: const EdgeInsets.only(right: 25.0),
+            child: Avatar.small(
+              url:
+                  "https://talhakarakoyunlu.github.io/cv/images/talha%20profile%20picture.png",
+            ),
           ),
         ],
       ),

@@ -1,3 +1,5 @@
+import 'package:chat_app/screens/contact_details_screen.dart';
+import 'package:chat_app/screens/conversation.dart';
 import 'package:flutter/material.dart';
 
 import 'avatar.dart';
@@ -22,32 +24,42 @@ class ContactWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
-      padding: EdgeInsets.all(30),
-      decoration: BoxDecoration(
-        color: Colors.blue,
-        borderRadius: BorderRadius.circular(10),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Avatar.small(
-            url:
-            imageURL,
-          ),
-          Column(
-            children: [
-              Text(contactCustomName, style: contactsTextStyle,),
-              Text(contactPhoneNumber, style: contactsTextStyle,)
-            ],
-          ),
-          IconButton(
-              onPressed: () {
-                //TODO: Implement calling.
-              },
-              icon: Icon(Icons.call, size: 20, color: Colors.black54,)),
-        ],
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+          return ContactDetailsScreen();
+        }));
+      },
+      child: Container(
+        margin: EdgeInsets.symmetric(vertical: 20, horizontal: 10),
+        padding: EdgeInsets.all(30),
+        decoration: BoxDecoration(
+          color: Colors.blue,
+          borderRadius: BorderRadius.circular(10),
+        ),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Avatar.small(
+              url:
+              imageURL,
+            ),
+            Column(
+              children: [
+                Text(contactCustomName, style: contactsTextStyle,),
+                Text(contactPhoneNumber, style: contactsTextStyle,)
+              ],
+            ),
+            IconButton(
+                onPressed: () {
+                  //TODO: Implement messaging.
+                  Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                    return ConversationPage(theme: "light");
+                  }));
+                },
+                icon: Icon(Icons.message, size: 20, color: Colors.black54,)),
+          ],
+        ),
       ),
     );
   }
