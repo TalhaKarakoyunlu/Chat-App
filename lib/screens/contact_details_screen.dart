@@ -6,29 +6,25 @@ import 'package:chat_app/widgets/contact_widget_button.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../widgets/icon_buttons.dart';
 
-const contactCustomNameTextStyle = TextStyle(
-  fontSize: 30,
-  color: Colors.blue,
-  fontWeight: FontWeight.bold
-);
+const contactCustomNameTextStyle =
+    TextStyle(fontSize: 30, color: Colors.blue, fontWeight: FontWeight.bold);
 
-const contactNameTextStyle = TextStyle(
-    color: Colors.black,
-    fontSize: 15.0
-);
+const contactNameTextStyle = TextStyle(color: Colors.black, fontSize: 15.0);
 
 class ContactDetailsScreen extends StatelessWidget {
-
-  const ContactDetailsScreen({required this.contactName, required this.contactPhoneNumber});
+  const ContactDetailsScreen(
+      {super.key, required this.contactName, required this.contactPhoneNumber});
 
   final String contactName;
   final String contactPhoneNumber;
 
   @override
   Widget build(BuildContext context) {
-
-    ContactData? contact = context.read<ContactDataNotifier>().findContactByPhoneNumber(contactPhoneNumber);
+    ContactData? contact = context
+        .read<ContactDataNotifier>()
+        .findContactByPhoneNumber(contactPhoneNumber);
 
     return Scaffold(
       appBar: AppBar(
@@ -73,7 +69,8 @@ class ContactDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextButton(onPressed: () {}, child: Text('Get User Information')),Padding(
+            TextButton(onPressed: () {}, child: Text('Get User Information')),
+            Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
               child: Column(
@@ -127,7 +124,7 @@ class ContactDetailsScreen extends StatelessWidget {
               ),
             ),
             Column(
-              children: const [
+              children: [
                 Padding(
                   padding: EdgeInsets.only(
                     top: 30.0,
@@ -143,10 +140,11 @@ class ContactDetailsScreen extends StatelessWidget {
                   ),
                 ),
                 ListTile(
-                leading: Icon(Icons.person),
-                title: Text(contact.contactUsername),
-                subtitle: Text('Username'),
-              ),ListTile(
+                  leading: Icon(Icons.person),
+                  title: Text(contact.contactUsername),
+                  subtitle: Text('Username'),
+                ),
+                ListTile(
                   leading: Icon(Icons.email),
                   title: Text(contact.contactEmail),
                   subtitle: Text('Email'),
@@ -164,4 +162,3 @@ class ContactDetailsScreen extends StatelessWidget {
     );
   }
 }
-

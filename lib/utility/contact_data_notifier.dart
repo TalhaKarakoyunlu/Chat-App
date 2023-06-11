@@ -9,10 +9,8 @@ import 'secrets.dart';
 class ContactDataNotifier with ChangeNotifier {
   List<ContactData> _contacts = [];
   List<ContactData> get contacts => _contacts;
-
   UserDataNotifier userDataNotifier = UserDataNotifier();
   DatabaseHelper _databaseHelper = DatabaseHelper();
-
   // Future<void> loadContacts() async {
   //   // Load contacts from the database
   //   DatabaseHelper databaseHelper = DatabaseHelper();
@@ -64,7 +62,8 @@ class ContactDataNotifier with ChangeNotifier {
   //   }
   // }
 
-  Future<void> addNewContact(String signedInUsername, String phoneNumber, String contactName) async {
+  Future<void> addNewContact(
+      String signedInUsername, String phoneNumber, String contactName) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     MySqlConnection? conn = await databaseHelper.createConnection();
 
@@ -109,29 +108,25 @@ class ContactDataNotifier with ChangeNotifier {
       Results rows = await _databaseHelper.showContacts();
 
       for (var row in rows) {
-
         Results contactRows = await _databaseHelper.findUsersById(row[2]);
 
-        int i=0;
+        int i = 0;
         for (var contactRow in contactRows) {
-
           ContactData contact = ContactData(
-            id: row[0],
-            userId: row[1],
-            contactUserId: row[2],
-            contactCustomName: row[3],
-            contactName: contactRow[1],
-            contactUsername: contactRow[2],
-            contactPhoneNumber: contactRow[3],
-            contactEmail: contactRow[4],
-            contactImageURL: contactRow[6],
-            contactLastUpdate: contactRow[7]
-          );
+              id: row[0],
+              userId: row[1],
+              contactUserId: row[2],
+              contactCustomName: row[3],
+              contactName: contactRow[1],
+              contactUsername: contactRow[2],
+              contactPhoneNumber: contactRow[3],
+              contactEmail: contactRow[4],
+              contactImageURL: contactRow[6],
+              contactLastUpdate: contactRow[7]);
           print('Contact information ${contactRow[i]}');
           i++;
           contacts.add(contact);
         }
-
       }
 
       _contacts = contacts;
@@ -144,7 +139,8 @@ class ContactDataNotifier with ChangeNotifier {
 
   ContactData? findContactByID(int contactID) {
     for (ContactData contact in _contacts) {
-      if (contact.id == contactID) {  // Replace "getID()" with your actual ID property
+      if (contact.id == contactID) {
+        // Replace "getID()" with your actual ID property
         return contact;
       }
     }
@@ -153,7 +149,8 @@ class ContactDataNotifier with ChangeNotifier {
 
   ContactData? findContactByUsername(String contactUsername) {
     for (ContactData contact in _contacts) {
-      if (contact.contactUsername == contactUsername) {  // Replace "getID()" with your actual ID property
+      if (contact.contactUsername == contactUsername) {
+        // Replace "getID()" with your actual ID property
         return contact;
       }
     }
@@ -162,12 +159,11 @@ class ContactDataNotifier with ChangeNotifier {
 
   ContactData? findContactByPhoneNumber(String phoneNumber) {
     for (ContactData contact in _contacts) {
-      if (contact.contactPhoneNumber == phoneNumber) {  // Replace "getID()" with your actual ID property
+      if (contact.contactPhoneNumber == phoneNumber) {
+        // Replace "getID()" with your actual ID property
         return contact;
       }
     }
     return null;
   }
-
-
 }
