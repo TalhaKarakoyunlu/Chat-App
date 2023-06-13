@@ -112,7 +112,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         // If all conditions met, add the user to the database and go the main screen.
                         if (password == retypePassword) {
                           var userDataNotifier = Provider.of<UserDataNotifier>(context, listen: false);
-                          await userDataNotifier.createUserData(name, username, phoneNumber, email, password, null);
+                          await userDataNotifier.signUpUser(name, username, phoneNumber, email, password, null);
 
                           print('Sign up successful. Username: $username');
 

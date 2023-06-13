@@ -1,13 +1,11 @@
+import 'package:chat_app/models/user_data.dart';
+
 class ContactData {
   final int id;
   final int userId;
   final int contactUserId;
   final String contactCustomName;
-  late final String contactName;
-  final String contactUsername;
-  final String contactPhoneNumber;
-  final String contactEmail;
-  final String? contactImageURL;
+  UserData? contactUser; // Reference to the associated user
   final DateTime contactLastUpdate;
 
   ContactData({
@@ -15,11 +13,7 @@ class ContactData {
     required this.userId,
     required this.contactUserId,
     required this.contactCustomName,
-    required this.contactName,
-    required this.contactUsername,
-    required this.contactPhoneNumber,
-    required this.contactEmail,
-    required this.contactImageURL,
+    this.contactUser,
     required this.contactLastUpdate,
   });
 }

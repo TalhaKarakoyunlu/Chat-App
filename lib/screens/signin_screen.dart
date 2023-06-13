@@ -4,6 +4,7 @@ import 'package:chat_app/utility/database_helper.dart';
 import 'package:flutter/material.dart';
 import 'package:mysql1/mysql1.dart';
 import '../models/user_data.dart';
+import '../utility/contact_data_notifier.dart';
 import '../utility/user_data_notifier.dart';
 import 'package:provider/provider.dart';
 
@@ -140,6 +141,9 @@ class SigninScreen extends StatelessWidget {
                                 if (password == DBpassword) {
                                   print('Sign in successful. Username: $username');
                                   // TODO: Remove parameters and use ValueListenables instead. CHECKED ✅
+
+                                  await context.read<ContactDataNotifier>().loadContacts(userData.id);
+
                                   Navigator.of(context).push(MaterialPageRoute(builder: (context) => HomeScreen()));
                                 } else {
                                   print('Incorrect password. Try again.');

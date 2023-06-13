@@ -281,11 +281,11 @@ class DatabaseHelper {
     }
   }
 
-  Future<dynamic> showContacts() async {
+  Future<dynamic> showContacts(int userID) async {
     MySqlConnection? conn = await createConnection();
 
     try {
-      Results results = await conn!.query('SELECT * FROM contacts');
+      Results results = await conn!.query('SELECT * FROM contacts WHERE user_id = ?', [userID]);
 
       return results;
     } catch (e) {

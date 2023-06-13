@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:mysql1/mysql1.dart';
 import 'package:provider/provider.dart';
 import '../models/contact_data.dart';
+import '../models/user_data.dart';
 import 'database_helper.dart';
 import 'secrets.dart';
 
@@ -66,6 +67,7 @@ class ContactDataNotifier with ChangeNotifier {
   //   }
   // }
 
+  // Make this method work better. It takes too long to run.
   Future<void> addNewContact(
       String signedInUsername, String phoneNumber, String contactName) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
@@ -80,7 +82,8 @@ class ContactDataNotifier with ChangeNotifier {
 
           await databaseHelper.addContact(userId, contactName, phoneNumber);
 
-          Results results = await databaseHelper.showContacts();
+          // THIS LINE USED TO TAKE 5 EXTRA SECONDS!
+          // Results results = await databaseHelper.showContacts(userId);
 
           // if (results.isNotEmpty) {
           //   List<ContactData> newData = results.map((row) => ContactData(
@@ -108,27 +111,32 @@ class ContactDataNotifier with ChangeNotifier {
   Future<void> loadContacts(int? userId) async {
     try {
       List<ContactData> contacts = [];
-      // Results rows = await _databaseHelper.joinUsersAndContacts(userId);
-      Results rows = await _databaseHelper.showContacts();
+      Results rows = await _databaseHelper.showContacts(userId!);
 
       for (var row in rows) {
         Results contactRows = await _databaseHelper.findUsersById(row[2]);
 
-        int i = 0;
         for (var contactRow in contactRows) {
+          UserData contactUser = UserData(
+            id: contactRow[0],
+            name: contactRow[1],
+            username: contactRow[2],
+            phoneNumber: contactRow[3],
+            email: contactRow[4],
+            password: contactRow[5],
+            profilePictureURL: contactRow[6],
+            registration_date: contactRow[7],
+            last_update: contactRow[8],
+          );
+
           ContactData contact = ContactData(
-              id: row[0],
-              userId: row[1],
-              contactUserId: row[2],
-              contactCustomName: row[3],
-              contactName: contactRow[1],
-              contactUsername: contactRow[2],
-              contactPhoneNumber: contactRow[3],
-              contactEmail: contactRow[4],
-              contactImageURL: contactRow[6],
-              contactLastUpdate: contactRow[7]);
-          print('Contact information ${contactRow[i]}');
-          i++;
+            id: row[0],
+            userId: row[1],
+            contactUserId: row[2],
+            contactCustomName: row[3],
+            contactUser: contactUser,
+            contactLastUpdate: contactRow[7],
+          );
           contacts.add(contact);
         }
       }
@@ -140,6 +148,7 @@ class ContactDataNotifier with ChangeNotifier {
       // Handle the error appropriately (e.g., log the error, display an error message).
     }
   }
+
 
   ContactData? findContactByID(int contactID) {
     for (ContactData contact in _contacts) {
@@ -153,7 +162,7 @@ class ContactDataNotifier with ChangeNotifier {
 
   ContactData? findContactByUsername(String contactUsername) {
     for (ContactData contact in _contacts) {
-      if (contact.contactUsername == contactUsername) {
+      if (contact.contactUser!.username == contactUsername) {
         // Replace "getID()" with your actual ID property
         return contact;
       }
@@ -163,7 +172,7 @@ class ContactDataNotifier with ChangeNotifier {
 
   ContactData? findContactByPhoneNumber(String phoneNumber) {
     for (ContactData contact in _contacts) {
-      if (contact.contactPhoneNumber == phoneNumber) {
+      if (contact.contactUser!.phoneNumber == phoneNumber) {
         // Replace "getID()" with your actual ID property
         return contact;
       }
@@ -175,12 +184,12 @@ class ContactDataNotifier with ChangeNotifier {
       ContactData contact, String newContactName) async {
     try {
       // Update the contact's name
-      contact.contactName = newContactName;
+      contact.contactUser!.name = newContactName;
 
       // Update the contact's name in the database
       await _databaseHelper.updateContactName(
         contact.userId,
-        contact.contactPhoneNumber,
+        contact.contactUser!.phoneNumber,
         newContactName,
       );
 

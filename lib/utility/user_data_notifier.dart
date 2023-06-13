@@ -31,7 +31,7 @@ class UserDataNotifier with ChangeNotifier {
     }
   }
 
-  Future<void> createUserData(String name, String username, String phoneNumber, String email, String password, String? profilePictureURL) async {
+  Future<void> signUpUser(String name, String username, String phoneNumber, String email, String password, String? profilePictureURL) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
     MySqlConnection? conn = await databaseHelper.createConnection();
 
@@ -52,7 +52,8 @@ class UserDataNotifier with ChangeNotifier {
           email: row[4],
           password: row[5],
           profilePictureURL: row[6],
-            last_update: row[7]
+            registration_date: row[7],
+            last_update: row[8]
         )).toList();
 
         if (_allUserDatas.isEmpty) {
@@ -100,7 +101,8 @@ class UserDataNotifier with ChangeNotifier {
           email: row[4],
           password: row[5],
           profilePictureURL: row[6],
-            last_update: row[7]
+            registration_date: row[7],
+            last_update: row[8]
         )).toList();
 
         if (_allUserDatas.isEmpty) {
@@ -142,7 +144,8 @@ class UserDataNotifier with ChangeNotifier {
           email: row[4],
           password: row[5],
           profilePictureURL: row[6],
-          last_update: row[7]
+          registration_date: row[7],
+          last_update: row[8]
         )).toList();
 
         _allUserDatas.addAll(newData);
@@ -156,6 +159,10 @@ class UserDataNotifier with ChangeNotifier {
         await databaseHelper.removeConnection(conn);
       }
     }
+  }
+
+  Future<void> addContactUsersToModel() async {
+
   }
 
   // Future<void> addNewContact(String phoneNumber, String contactName) async {

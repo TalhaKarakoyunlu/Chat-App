@@ -120,10 +120,6 @@ class ContactDetailsScreen extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            TextButton(
-              onPressed: () {},
-              child: Text('Get User Information'),
-            ),
             Padding(
               padding:
                   const EdgeInsets.symmetric(horizontal: 10.0, vertical: 20.0),
@@ -145,7 +141,7 @@ class ContactDetailsScreen extends StatelessWidget {
                     height: 20.0,
                   ),
                   Text(
-                    contact?.contactName ?? '',
+                    contact?.contactUser!.name ?? '',
                     style: contactNameTextStyle,
                   ),
                 ],
@@ -198,17 +194,17 @@ class ContactDetailsScreen extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text(contact?.contactUsername ?? ''),
+                  title: Text(contact?.contactUser!.username ?? ''),
                   subtitle: Text('Username'),
                 ),
                 ListTile(
                   leading: Icon(Icons.email),
-                  title: Text(contact?.contactEmail ?? ''),
+                  title: Text(contact?.contactUser!.email ?? ''),
                   subtitle: Text('Email'),
                 ),
                 ListTile(
                   leading: Icon(Icons.phone),
-                  title: Text(contact?.contactPhoneNumber ?? ''),
+                  title: Text(contact?.contactUser!.phoneNumber ?? ''),
                   subtitle: Text('Phone Number'),
                 ),
               ],

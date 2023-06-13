@@ -1,12 +1,13 @@
 class UserData {
   final int id;
-  final String name;
+  late final String name;
   final String username;
   final String phoneNumber;
   final String email;
   final String password;
   final String? profilePictureURL;
-  final dynamic last_update;
+  final DateTime registration_date;
+  final DateTime last_update;
 
   UserData(
       {required this.name,
@@ -16,5 +17,6 @@ class UserData {
       required this.password,
       required this.profilePictureURL,
       required this.id,
+        required this.registration_date,
       required this.last_update});
 }

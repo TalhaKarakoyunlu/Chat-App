@@ -28,7 +28,7 @@ class ContactsPage extends StatelessWidget {
           child: ListView.builder(
             itemCount: contacts.length,
               itemBuilder: (context, int index) {
-              return ContactWidget(contactCustomName: contacts[index].contactCustomName, contactPhoneNumber: contacts[index].contactPhoneNumber, imageURL: contacts[index].contactImageURL ?? "https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg",);
+              return ContactWidget(contactCustomName: contacts[index].contactCustomName, contactPhoneNumber: contacts[index].contactUser!.phoneNumber, imageURL: contacts[index].contactUser!.profilePictureURL ?? "https://static.vecteezy.com/system/resources/thumbnails/002/534/006/small/social-media-chatting-online-blank-profile-picture-head-and-body-icon-people-standing-icon-grey-background-free-vector.jpg",);
           }),
         ),
       ],
