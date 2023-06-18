@@ -16,58 +16,7 @@ class ContactDataNotifier with ChangeNotifier {
   UserDataNotifier userDataNotifier = UserDataNotifier();
   DatabaseHelper _databaseHelper = DatabaseHelper();
 
-  // Future<void> loadContacts() async {
-  //   // Load contacts from the database
-  //   DatabaseHelper databaseHelper = DatabaseHelper();
-  //   MySqlConnection? conn = await databaseHelper.createConnection();
-  //
-  //   if (conn != null) {
-  //     try {
-  //       int userId = _signedInUserData.id;
-  //       Results results = await conn.query(
-  //         'SELECT * FROM contacts WHERE user_id = ?',
-  //         [userId],
-  //       );
-  //
-  //       _contacts = results.map((row) {
-  //         return ContactData(
-  //           id: row['id'],
-  //           userId: row['user_id'],
-  //           contactUserId: row['contact_user_id'],
-  //           contactName: row['contact_name'],
-  //         );
-  //       }).toList();
-  //
-  //       notifyListeners();
-  //     } catch (e) {
-  //       print('Error loading contacts: $e');
-  //     } finally {
-  //       await databaseHelper.removeConnection(conn);
-  //     }
-  //   }
-  // }
-
-  // Future<void> addNewContact(int contactUserId, String contactName) async {
-  //   DatabaseHelper databaseHelper = DatabaseHelper();
-  //   MySqlConnection? conn = await databaseHelper.createConnection();
-  //
-  //   if (conn != null) {
-  //     try {
-  //       int userId = userDataNotifier.signedInUserData.id;
-  //
-  //       await databaseHelper.addContact(conn, userId, contactUserId, contactName);
-  //
-  //       print('New contact added.');
-  //       notifyListeners();
-  //     } catch (e) {
-  //       print('Error adding contact: $e');
-  //     } finally {
-  //       await databaseHelper.removeConnection(conn);
-  //     }
-  //   }
-  // }
-
-  // Make this method work better. It takes too long to run.
+  //TODO: Make this method work better. It takes too long to run. DONE✅
   Future<void> addNewContact(
       String signedInUsername, String phoneNumber, String contactName) async {
     DatabaseHelper databaseHelper = DatabaseHelper();
@@ -80,7 +29,41 @@ class ContactDataNotifier with ChangeNotifier {
         if (userDataNotifier.signedInUserData != null) {
           int userId = userDataNotifier.signedInUserData!.id;
 
-          await databaseHelper.addContact(userId, contactName, phoneNumber);
+          Results? newContact = await databaseHelper.addContact(userId, contactName, phoneNumber);
+
+          late Results newContactUserResults;
+          late UserData newContactUserData;
+          late ContactData contact;
+
+          for (var row in newContact!) {
+            newContactUserResults = await _databaseHelper.findUsersById(row[2]);
+          }
+
+          for (var row in newContactUserResults) {
+            newContactUserData = UserData(
+              id: row[0],
+              name: row[1],
+              username: row[2],
+              phoneNumber: row[3],
+              email: row[4],
+              password: row[5],
+              profilePictureURL: row[6],
+              registration_date: row[7],
+              last_update: row[8],
+            );
+          }
+
+          for (var row in newContact) {
+            contact = ContactData(
+              id: row[0],
+              userId: row[1],
+              contactUserId: row[2],
+              contactCustomName: row[3],
+              contactUser: newContactUserData,
+            );
+          }
+
+          _contacts.add(contact);
 
           // THIS LINE USED TO TAKE 5 EXTRA SECONDS!
           // Results results = await databaseHelper.showContacts(userId);
@@ -113,29 +96,33 @@ class ContactDataNotifier with ChangeNotifier {
       List<ContactData> contacts = [];
       Results rows = await _databaseHelper.showContacts(userId!);
 
+      late Results contactRows;
+      late UserData contactUser;
+
       for (var row in rows) {
-        Results contactRows = await _databaseHelper.findUsersById(row[2]);
+        contactRows = await _databaseHelper.findUsersById(row[2]);
+      }
 
-        for (var contactRow in contactRows) {
-          UserData contactUser = UserData(
-            id: contactRow[0],
-            name: contactRow[1],
-            username: contactRow[2],
-            phoneNumber: contactRow[3],
-            email: contactRow[4],
-            password: contactRow[5],
-            profilePictureURL: contactRow[6],
-            registration_date: contactRow[7],
-            last_update: contactRow[8],
-          );
+      for (var contactRow in contactRows) {
+        contactUser = UserData(
+          id: contactRow[0],
+          name: contactRow[1],
+          username: contactRow[2],
+          phoneNumber: contactRow[3],
+          email: contactRow[4],
+          password: contactRow[5],
+          profilePictureURL: contactRow[6],
+          registration_date: contactRow[7],
+          last_update: contactRow[8],
+        );
 
+        for (var row in rows) {
           ContactData contact = ContactData(
             id: row[0],
             userId: row[1],
             contactUserId: row[2],
             contactCustomName: row[3],
             contactUser: contactUser,
-            contactLastUpdate: contactRow[7],
           );
           contacts.add(contact);
         }

@@ -251,7 +251,7 @@ class DatabaseHelper {
   }
 
   // CONTACTS TABLE
-  Future<void> addContact(
+  Future<dynamic> addContact(
       int userId, String contactName, String contactPhoneNumber) async {
     MySqlConnection? conn = await createConnection();
 
@@ -269,7 +269,12 @@ class DatabaseHelper {
           [userId, contactUserId, contactName],
         );
 
-        print('Contact added successfully.');
+        // Retrieve the added contact from the database
+        Results addedContactRow = await conn.query(
+          'SELECT * FROM contacts WHERE id = LAST_INSERT_ID()',
+        );
+
+        return addedContactRow;
       } else {
         print('No user found with the provided phone number.');
       }
@@ -279,6 +284,7 @@ class DatabaseHelper {
     } finally {
       await removeConnection(conn);
     }
+    return null;
   }
 
   Future<dynamic> showContacts(int userID) async {

@@ -68,9 +68,10 @@ class AddContactScreen extends StatelessWidget {
                   await context.read<ContactDataNotifier>().addNewContact(
                       signedInUser!.username, phoneNumber, contactName);
 
-                  await context
-                      .read<ContactDataNotifier>()
-                      .loadContacts(signedInUser.id);
+                  // THIS RELOADS ALL CONTACTS FROM SCRATCH AND CAUSES TOO MUCH TIME LOSS
+                  // await context
+                  //     .read<ContactDataNotifier>()
+                  //     .loadContacts(signedInUser.id);
 
                   Navigator.pop(context);
                 },

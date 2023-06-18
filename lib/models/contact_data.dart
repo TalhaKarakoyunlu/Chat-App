@@ -6,7 +6,6 @@ class ContactData {
   final int contactUserId;
   final String contactCustomName;
   UserData? contactUser; // Reference to the associated user
-  final DateTime contactLastUpdate;
 
   ContactData({
     required this.id,
@@ -14,6 +13,5 @@ class ContactData {
     required this.contactUserId,
     required this.contactCustomName,
     this.contactUser,
-    required this.contactLastUpdate,
   });
 }
