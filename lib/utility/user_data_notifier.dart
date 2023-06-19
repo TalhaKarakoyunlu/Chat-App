@@ -21,7 +21,6 @@ class UserDataNotifier with ChangeNotifier {
     if (emailRegex.hasMatch(emailOrUsername)) {
       // Input matches the email format
       print('Input is an email');
-
       return true;
     } else {
       // Input is assumed to be a username
@@ -112,7 +111,7 @@ class UserDataNotifier with ChangeNotifier {
 
 
         print('New data length: ' + newData.length.toString());
-        print('signed in user data ' + _signedInUserData.toString());
+        print('signed in user data ' + _signedInUserData!.name);
         print('All users: ' + _allUserDatas.toString());
 
         notifyListeners();

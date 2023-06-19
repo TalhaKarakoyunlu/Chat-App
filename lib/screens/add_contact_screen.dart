@@ -65,8 +65,10 @@ class AddContactScreen extends StatelessWidget {
                   phoneNumber = phoneNumberController.text;
                   contactName = contactNameController.text;
 
+                  print("SIGNED IN USER NAME " + signedInUser!.name);
+
                   await context.read<ContactDataNotifier>().addNewContact(
-                      signedInUser!.username, phoneNumber, contactName);
+                      signedInUser, phoneNumber, contactName);
 
                   // THIS RELOADS ALL CONTACTS FROM SCRATCH AND CAUSES TOO MUCH TIME LOSS
                   // await context

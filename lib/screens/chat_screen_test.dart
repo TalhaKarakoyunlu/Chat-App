@@ -70,7 +70,7 @@ class ChatScreenTest extends StatelessWidget {
       body: Column(
         children: [
           Expanded(
-            child: _DemoMessageList(),
+            child: _DemoMessageList(senderId: signedInUserData.id,),
           ),
           _ActionBar(
             senderId: signedInUserData.id,
@@ -83,41 +83,79 @@ class ChatScreenTest extends StatelessWidget {
 }
 
 class _DemoMessageList extends StatelessWidget {
-  const _DemoMessageList({Key? key}) : super(key: key);
+  const _DemoMessageList({required this.senderId});
+
+  final int senderId;
+
+  @override
+  Widget build(BuildContext context) {
+
+    List<MessageData2> messages = context.watch<MessageDataNotifier>().messages;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: ListView.builder(
+        itemCount: messages.length > 0 ? messages.length : 1,
+        itemBuilder: (context, index) {
+          if (messages.length > 0) {
+            MessageData2 message = messages[index];
+            if (message.sender_id == senderId) {
+              return MessageTile(
+                message: message.message,
+                messageDate: message.created_at.toString(),
+                messageType: MessageType.sent,
+              );
+            } else {
+              return MessageTile(
+                message: message.message,
+                messageDate: message.created_at.toString(),
+                messageType: MessageType.received,
+              );
+            }
+          } else {
+            return Center(
+              child: ListTile(
+                title: Text("No messages available"),
+              ),
+            );
+          }
+        },
+      )
+    );
+  }
+}
+
+enum MessageType {
+  received,
+  sent,
+}
+
+class MessageTile extends StatelessWidget {
+  const MessageTile({
+    Key? key,
+    required this.message,
+    required this.messageDate,
+    required this.messageType,
+  }) : super(key: key);
+
+  final String message;
+  final String messageDate;
+  final MessageType messageType;
+
+  static const _borderRadius = 26.0;
 
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-      child: ListView(
-        children: const [
-          _DateLable(lable: "Yesterday"),
-          _MessageTile(
-            message: "Hi m8, hows it goin",
-            messageDate: "15.35 PM",
-          ),
-          _MessageOwnTile(
-            message: "Sup fam, is al good",
-            messageDate: "15.35 PM",
-          ),
-          _MessageTile(
-            message: "You picked the wrong house fool!",
-            messageDate: "15.37 PM",
-          ),
-          _MessageOwnTile(
-            message: "Ey, ey ey ey ey, big smoke! It's me! Carl, chill, chill!",
-            messageDate: "15.37 PM",
-          ),
-          _MessageTile(
-            message: "...CJ? OOOOHHH MY DOG, WASSUP HAHAHA",
-            messageDate: "15.38 PM",
-          ),
-          _MessageTile(
-            message:
-                "MessageLimitTest test test test test test test test test test test zort test test test test test test test ",
-            messageDate: "zortu zort geçe",
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: messageType == MessageType.received
+          ? _MessageTile(
+        message: message,
+        messageDate: messageDate,
+      )
+          : _MessageOwnTile(
+        message: message,
+        messageDate: messageDate,
       ),
     );
   }
@@ -137,52 +175,49 @@ class _MessageTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: Theme.of(context).cardColor,
-                borderRadius: const BorderRadius.only(
-                  topLeft: Radius.circular(_borderRadius),
-                  topRight: Radius.circular(_borderRadius),
-                  bottomRight: Radius.circular(_borderRadius),
-                ),
+    return Align(
+      alignment: Alignment.centerLeft,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).cardColor,
+              borderRadius: const BorderRadius.only(
+                topLeft: Radius.circular(_borderRadius),
+                topRight: Radius.circular(_borderRadius),
+                bottomRight: Radius.circular(_borderRadius),
               ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
-                child: Text(
-                  message,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textLight,
-                  ),
+            ),
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textLight,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 8.0,
-                bottom: 11,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 8.0,
+              bottom: 11,
+            ),
+            child: Text(
+              messageDate,
+              style: const TextStyle(
+                color: AppColors.textFaded,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
-              child: Text(
-                messageDate,
-                style: const TextStyle(
-                  color: AppColors.textFaded,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
@@ -202,56 +237,54 @@ class _MessageOwnTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Align(
-        alignment: Alignment.centerRight,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Container(
-              decoration: const BoxDecoration(
-                color: AppColors.secondary,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(_borderRadius),
-                  bottomRight: Radius.circular(_borderRadius),
-                  bottomLeft: Radius.circular(_borderRadius),
-                ),
+    return Align(
+      alignment: Alignment.centerRight,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Container(
+            decoration: const BoxDecoration(
+              color: AppColors.secondary,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(_borderRadius),
+                bottomRight: Radius.circular(_borderRadius),
+                bottomLeft: Radius.circular(_borderRadius),
               ),
-              child: Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
-                child: Text(
-                  message,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w400,
-                    color: AppColors.textLight,
-                  ),
+            ),
+            child: Padding(
+              padding:
+              const EdgeInsets.symmetric(horizontal: 12.0, vertical: 20),
+              child: Text(
+                message,
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w400,
+                  color: AppColors.textLight,
                 ),
               ),
             ),
-            Padding(
-              padding: const EdgeInsets.only(
-                top: 8.0,
-                bottom: 11,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(
+              top: 8.0,
+              bottom: 11,
+            ),
+            child: Text(
+              messageDate,
+              style: const TextStyle(
+                color: AppColors.textFaded,
+                fontSize: 14,
+                fontWeight: FontWeight.bold,
               ),
-              child: Text(
-                messageDate,
-                style: const TextStyle(
-                  color: AppColors.textFaded,
-                  fontSize: 14,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            )
-          ],
-        ),
+            ),
+          )
+        ],
       ),
     );
   }
 }
+
 
 class _DateLable extends StatelessWidget {
   const _DateLable({

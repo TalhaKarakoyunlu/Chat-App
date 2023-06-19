@@ -17,6 +17,7 @@ class MessageDataNotifier with ChangeNotifier {
     try {
       Results messageRows = await _databaseHelper.sendMessage(message, senderId, receiverId, status);
 
+
       late MessageData2 newMessage;
 
       for (var row in messageRows) {
@@ -41,5 +42,48 @@ class MessageDataNotifier with ChangeNotifier {
 
   }
 
+  Future<void> showAllMessages(int senderId, int receiverId) async {
+
+    try {
+      Results senderMessageRows = await _databaseHelper.showMessages(senderId, receiverId);
+      Results receiverMessageRows = await _databaseHelper.showMessages(receiverId, senderId);
+
+      List<MessageData2> allMessages = [];
+      late MessageData2 message;
+
+      for (var row in senderMessageRows) {
+        message = MessageData2(
+            id: row[0],
+            message: row[1],
+            sender_id: row[2],
+            reciever_id: row[3],
+            created_at: row[4],
+            status: row[5]
+        );
+        allMessages.add(message);
+      }
+
+      for (var row in receiverMessageRows) {
+        message = MessageData2(
+            id: row[0],
+            message: row[1],
+            sender_id: row[2],
+            reciever_id: row[3],
+            created_at: row[4],
+            status: row[5]
+        );
+        allMessages.add(message);
+      }
+
+      // Sort the messages by the created_at field in ascending order
+      allMessages.sort((a, b) => a.created_at.compareTo(b.created_at));
+
+      _messages = allMessages;
+
+    } catch (e) {
+      print('Error displaying messages: $e');
+    }
+
+  }
 
 }

@@ -7,6 +7,7 @@ import '../models/contact_data.dart';
 import '../utility/contact_data_notifier.dart';
 import '../utility/database_helper.dart';
 import '../theme.dart';
+import '../utility/message_data_notifier.dart';
 import '../widgets/avatar.dart';
 import '../widgets/contact_widget_button.dart';
 import '../widgets/icon_buttons.dart';
@@ -171,7 +172,9 @@ class ContactDetailsScreen extends StatelessWidget {
                     buttonAction: () {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
 
-                        return ChatScreenTest(signedInUserData: signedInUser!, contactData: contact!);
+                        context.read<MessageDataNotifier>().showAllMessages(signedInUser!.id, contact!.contactUser!.id);
+
+                        return ChatScreenTest(signedInUserData: signedInUser, contactData: contact);
                       }));
                     },
                   ),

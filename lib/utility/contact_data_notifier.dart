@@ -13,71 +13,66 @@ class ContactDataNotifier with ChangeNotifier {
 
   List<ContactData> get contacts => _contacts;
   ContactData? get currentContactData => _currentContactData;
-  UserDataNotifier userDataNotifier = UserDataNotifier();
   DatabaseHelper _databaseHelper = DatabaseHelper();
 
   //TODO: Make this method work better. It takes too long to run. DONE✅
   Future<void> addNewContact(
-      String signedInUsername, String phoneNumber, String contactName) async {
+      UserData signedInUser, String phoneNumber, String contactName) async {
 
     try {
-      if (userDataNotifier.signedInUserData != null) {
-        int userId = userDataNotifier.signedInUserData!.id;
+      int userId = signedInUser.id;
 
-        Results? newContact = await _databaseHelper.addContact(userId, contactName, phoneNumber);
+      Results? newContact = await _databaseHelper.addContact(userId, contactName, phoneNumber);
 
-        late Results newContactUserResults;
-        late UserData newContactUserData;
-        late ContactData contact;
+      late Results newContactUserResults;
+      late UserData newContactUserData;
+      late ContactData contact;
 
-        for (var row in newContact!) {
-          newContactUserResults = await _databaseHelper.findUsersById(row[2]);
-        }
-
-        for (var row in newContactUserResults) {
-          newContactUserData = UserData(
-            id: row[0],
-            name: row[1],
-            username: row[2],
-            phoneNumber: row[3],
-            email: row[4],
-            password: row[5],
-            profilePictureURL: row[6],
-            registration_date: row[7],
-            last_update: row[8],
-          );
-        }
-
-        for (var row in newContact) {
-          contact = ContactData(
-            id: row[0],
-            userId: row[1],
-            contactUserId: row[2],
-            contactCustomName: row[3],
-            contactUser: newContactUserData,
-          );
-        }
-
-        _contacts.add(contact);
-
-        // THIS LINE USED TO TAKE 5 EXTRA SECONDS!
-        // Results results = await databaseHelper.showContacts(userId);
-
-        // if (results.isNotEmpty) {
-        //   List<ContactData> newData = results.map((row) => ContactData(
-        //     id: row[0],
-        //     userId: row[1],
-        //     contactUserId: row[2],
-        //     contactCustomName: row[3],
-        //   )).toList();
-        //
-        //   _contacts.addAll(newData);
-        //
-        //   print('New contact added. Contact name is ' + contacts.first.contactCustomName);
-        // }
-      } else {
-        print('Signed in user data is null.');
+      for (var row in newContact!) {
+        newContactUserResults = await _databaseHelper.findUsersById(row[2]);
       }
+
+      for (var row in newContactUserResults) {
+        newContactUserData = UserData(
+          id: row[0],
+          name: row[1],
+          username: row[2],
+          phoneNumber: row[3],
+          email: row[4],
+          password: row[5],
+          profilePictureURL: row[6],
+          registration_date: row[7],
+          last_update: row[8],
+        );
+      }
+
+      for (var row in newContact) {
+        contact = ContactData(
+          id: row[0],
+          userId: row[1],
+          contactUserId: row[2],
+          contactCustomName: row[3],
+          contactUser: newContactUserData,
+        );
+      }
+
+      _contacts.add(contact);
+
+      // THIS LINE USED TO TAKE 5 EXTRA SECONDS!
+      // Results results = await databaseHelper.showContacts(userId);
+
+      // if (results.isNotEmpty) {
+      //   List<ContactData> newData = results.map((row) => ContactData(
+      //     id: row[0],
+      //     userId: row[1],
+      //     contactUserId: row[2],
+      //     contactCustomName: row[3],
+      //   )).toList();
+      //
+      //   _contacts.addAll(newData);
+      //
+      //   print('New contact added. Contact name is ' + contacts.first.contactCustomName);
+      // }
 
       notifyListeners();
     } catch (e) {
