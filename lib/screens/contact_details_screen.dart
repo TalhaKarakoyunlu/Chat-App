@@ -1,3 +1,5 @@
+import 'package:chat_app/screens/chat_screen_test.dart';
+import 'package:chat_app/utility/user_data_notifier.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -33,11 +35,11 @@ class ContactDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final contactDataNotifier = context.watch<ContactDataNotifier>();
-    final contact =
-        contactDataNotifier.findContactByPhoneNumber(contactPhoneNumber);
+    final contact = contactDataNotifier.findContactByPhoneNumber(contactPhoneNumber);
 
-    final TextEditingController _contactNameController =
-        TextEditingController();
+    final signedInUser = context.watch<UserDataNotifier>().signedInUserData;
+
+    final TextEditingController _contactNameController = TextEditingController();
 
     return Scaffold(
       appBar: AppBar(
@@ -166,7 +168,11 @@ class ContactDetailsScreen extends StatelessWidget {
                   ContactWidgetButton(
                     buttonIcon: Icon(Icons.message),
                     buttonName: 'Message',
-                    buttonAction: () {},
+                    buttonAction: () {
+                      Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+                        return ChatScreenTest(signedInUserData: signedInUser!, contactData: contact!);
+                      }));
+                    },
                   ),
                   ContactWidgetButton(
                     buttonIcon: Icon(Icons.email),

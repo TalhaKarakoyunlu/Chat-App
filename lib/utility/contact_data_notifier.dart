@@ -96,27 +96,29 @@ class ContactDataNotifier with ChangeNotifier {
       List<ContactData> contacts = [];
       Results rows = await _databaseHelper.showContacts(userId!);
 
-      late Results contactRows;
-      late UserData contactUser;
+      Map<int, UserData> contactUsers = {};
 
       for (var row in rows) {
-        contactRows = await _databaseHelper.findUsersById(row[2]);
+        Results contactRows = await _databaseHelper.findUsersById(row[2]);
+        for (var contactRow in contactRows) {
+          UserData contactUser = UserData(
+            id: contactRow[0],
+            name: contactRow[1],
+            username: contactRow[2],
+            phoneNumber: contactRow[3],
+            email: contactRow[4],
+            password: contactRow[5],
+            profilePictureURL: contactRow[6],
+            registration_date: contactRow[7],
+            last_update: contactRow[8],
+          );
+          contactUsers[contactUser.id] = contactUser;
+        }
       }
 
-      for (var contactRow in contactRows) {
-        contactUser = UserData(
-          id: contactRow[0],
-          name: contactRow[1],
-          username: contactRow[2],
-          phoneNumber: contactRow[3],
-          email: contactRow[4],
-          password: contactRow[5],
-          profilePictureURL: contactRow[6],
-          registration_date: contactRow[7],
-          last_update: contactRow[8],
-        );
-
-        for (var row in rows) {
+      for (var row in rows) {
+        UserData? contactUser = contactUsers[row[2]];
+        if (contactUser != null) {
           ContactData contact = ContactData(
             id: row[0],
             userId: row[1],
@@ -135,6 +137,7 @@ class ContactDataNotifier with ChangeNotifier {
       // Handle the error appropriately (e.g., log the error, display an error message).
     }
   }
+
 
 
   ContactData? findContactByID(int contactID) {

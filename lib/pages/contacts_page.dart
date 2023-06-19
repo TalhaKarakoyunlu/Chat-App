@@ -12,7 +12,6 @@ class ContactsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    var signedInUserData = context.watch<UserDataNotifier>().signedInUserData;
     var contacts = context.watch<ContactDataNotifier>().contacts;
 
     return Column(
