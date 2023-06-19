@@ -1,11 +1,14 @@
 import 'package:chat_app/models/contact_data.dart';
+import 'package:chat_app/models/message_data_2.dart';
 import 'package:chat_app/models/models.dart';
 import 'package:chat_app/models/user_data.dart';
 import 'package:chat_app/theme.dart';
+import 'package:chat_app/utility/message_data_notifier.dart';
 import 'package:chat_app/widgets/glowing_action_button.dart';
 import 'package:chat_app/widgets/icon_buttons.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import '../widgets/avatar.dart';
 
 class ChatScreenTest extends StatelessWidget {
@@ -21,6 +24,9 @@ class ChatScreenTest extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    List<MessageData2> messageData = context.watch<MessageDataNotifier>().messages;
+
     return Scaffold(
       appBar: AppBar(
         iconTheme: Theme.of(context).iconTheme,
@@ -62,11 +68,14 @@ class ChatScreenTest extends StatelessWidget {
         ],
       ),
       body: Column(
-        children: const [
+        children: [
           Expanded(
             child: _DemoMessageList(),
           ),
-          _ActionBar(),
+          _ActionBar(
+            senderId: signedInUserData.id,
+            receiverId: contactData.contactUser!.id,
+          ),
         ],
       ),
     );
@@ -322,10 +331,16 @@ class _AppBarTitle extends StatelessWidget {
 }
 
 class _ActionBar extends StatelessWidget {
-  const _ActionBar({Key? key}) : super(key: key);
+  const _ActionBar({required this.senderId, required this.receiverId});
+
+  final int senderId;
+  final int receiverId;
+
 
   @override
   Widget build(BuildContext context) {
+    TextEditingController messageController = TextEditingController();
+
     return SafeArea(
       bottom: true,
       top: false,
@@ -345,10 +360,11 @@ class _ActionBar extends StatelessWidget {
               ),
             ),
           ),
-          const Expanded(
+          Expanded(
             child: Padding(
               padding: EdgeInsets.only(left: 16),
               child: TextField(
+                controller: messageController,
                 style: TextStyle(
                   fontSize: 16,
                 ),
@@ -366,7 +382,10 @@ class _ActionBar extends StatelessWidget {
               color: AppColors.accent,
               icon: Icons.send_rounded,
               onPressed: () {
-                print("TODO: send a message");
+
+                //TODO: Send a message. DONE✅
+                context.read<MessageDataNotifier>().addNewMessage(messageController.text, senderId, receiverId, 'sent');
+
               },
             ),
           )

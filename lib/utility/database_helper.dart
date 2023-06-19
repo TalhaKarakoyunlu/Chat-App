@@ -361,4 +361,51 @@ class DatabaseHelper {
       await removeConnection(conn);
     }
   }
+
+  // MESSAGES TABLE
+    Future<dynamic> sendMessage(String message, int senderId, int receiverId, String status) async {
+      MySqlConnection? conn = await createConnection();
+
+      try {
+        await conn!.query(
+          'INSERT INTO messages (message, sender_id, receiver_id, status) VALUES (?, ?, ?, ?)',
+          [message, senderId, receiverId, status],
+        );
+
+        // Retrieve the added message from the database
+        Results addedMessage = await conn.query(
+          'SELECT * FROM messages WHERE id = LAST_INSERT_ID()',
+        );
+
+        return addedMessage;
+
+      } catch (e) {
+        print('Error sending a message: $e');
+        // Handle the error appropriately (e.g., log the error, display an error message).
+      } finally {
+        await removeConnection(conn);
+      }
+    }
+
+  Future<dynamic> showMessages(int senderId, int receiverId) async {
+    MySqlConnection? conn = await createConnection();
+
+    try {
+
+      Results results = await conn!.query(
+        'SELECT * FROM messages WHERE sender_id = ? AND receiver_id = ?',
+        [senderId, receiverId],
+      );
+
+      return results;
+
+    } catch (e) {
+      print('Error showing messages: $e');
+      // Handle the error appropriately (e.g., log the error, display an error message).
+    } finally {
+      await removeConnection(conn);
+    }
+  }
+
+
 }

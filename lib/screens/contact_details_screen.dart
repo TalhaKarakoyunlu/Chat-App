@@ -170,6 +170,7 @@ class ContactDetailsScreen extends StatelessWidget {
                     buttonName: 'Message',
                     buttonAction: () {
                       Navigator.of(context).push(MaterialPageRoute(builder: (context) {
+
                         return ChatScreenTest(signedInUserData: signedInUser!, contactData: contact!);
                       }));
                     },
